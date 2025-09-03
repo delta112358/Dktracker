@@ -1,0 +1,90 @@
+/* General Styles */
+
+body {
+  font-family: monospace;
+  background: #fafafa;
+  color: #222;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+th {
+  background: #f0f0f0;
+}
+
+tr:nth-child(even) td {
+  background: #fdfdfd;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+button:hover {
+  background: #f5f5f5;
+}
+
+thead input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: inherit;
+  font-size: inherit;
+}
+thead input:focus {
+  outline: 1px solid #aaa;
+  background: #fff;
+}
+
+.positive {
+  color: #56a15a;
+}
+.negative {
+  color: #bc4f4f;
+}
+
+.form-section {
+  border-top: 2px solid #ccc;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-grid input[type="checkbox"] {
+  margin-right: 0.3rem;
+}
+
+tr.game-separator td {
+  border-bottom: 2px solid #aaa; /* subtle line */
+}
