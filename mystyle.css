@@ -85,6 +85,30 @@ thead input:focus {
   margin-right: 0.3rem;
 }
 
+.form-section {
+  border-top: 2px solid #ccc;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.form-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
 tr.game-separator td {
   border-bottom: 2px solid #aaa; /* subtle line */
+}
+
+.points-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.points-control input {
+  width: 60px;
+  text-align: center;
 }

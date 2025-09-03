@@ -159,6 +159,18 @@ document.getElementById("addRound").addEventListener("click", addRound);
 document.getElementById("resetGame").addEventListener("click", resetGame);
 document.getElementById("exportGame").addEventListener("click", exportGame);
 
+// Points adjustment buttons
+document.getElementById("increasePoints").addEventListener("click", () => {
+  let input = document.getElementById("roundPoints");
+  input.value = parseInt(input.value || "1") + 1;
+});
+
+document.getElementById("decreasePoints").addEventListener("click", () => {
+  let input = document.getElementById("roundPoints");
+  let newValue = parseInt(input.value || "1") - 1;
+  input.value = Math.max(newValue, 1); // prevent < 1
+});
+
 // Initialize
 loadState();
 renderTable();

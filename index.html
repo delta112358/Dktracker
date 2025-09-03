@@ -39,7 +39,11 @@
       <h2>Add Round</h2>
       <label>
         Round Points:
-        <input type="number" id="roundPoints" placeholder="Points for round" />
+        <div class="points-control">
+          <button type="button" id="decreasePoints">−</button>
+          <input type="number" id="roundPoints" value="1" min="1" />
+          <button type="button" id="increasePoints">+</button>
+        </div>
       </label>
       <div class="form-grid">
         <label><input type="checkbox" id="winner0" /> Player 1 wins</label>
@@ -52,6 +56,8 @@
       <button type="button" id="resetGame">Reset</button>
       <button type="button" id="exportGame">Export</button>
     </section>
+
+
 
     <script src="script.js"></script>
   </body>
