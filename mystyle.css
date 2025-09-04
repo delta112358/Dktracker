@@ -1,29 +1,58 @@
-/* General Styles */
+/* CSS Custom Properties */
+:root {
+  --color-primary: #56a15a;
+  --color-primary-dark: #4a8c4f;
+  --color-secondary: #bc4f4f;
+  --color-secondary-dark: #a03d3d;
+  --color-success: #56a15a;
+  --color-warning: #f39c12;
+  --color-info: #3498db;
+  --color-text: #222;
+  --color-text-muted: #666;
+  --color-border: #ddd;
+  --color-border-light: #ccc;
+  --color-background: #fafafa;
+  --color-background-light: #f8f8f8;
+  --color-background-lighter: #f9f9f9;
+  --color-background-white: #fff;
+  --color-background-hover: #f5f5f5;
+  --border-radius: 4px;
+  --border-radius-large: 8px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-large: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --transition: 0.2s ease;
+}
 
+/* General Styles */
 body {
   font-family: monospace;
-  background: #fafafa;
-  color: #222;
+  background: var(--color-background);
+  color: var(--color-text);
   max-width: 900px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  margin: var(--spacing-xl) auto;
+  padding: 0 var(--spacing-md);
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 table {
   border-collapse: collapse;
   width: 100%;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-xl);
 }
 
 th,
 td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-sm);
   text-align: center;
 }
 
@@ -35,17 +64,19 @@ tr:nth-child(even) td {
   background: #fdfdfd;
 }
 
+/* Base button styles */
 button {
-  padding: 0.5rem 1rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid #aaa;
-  border-radius: 4px;
-  background: #fff;
+  border-radius: var(--border-radius);
+  background: var(--color-background-white);
   cursor: pointer;
-  margin-right: 0.5rem;
+  margin-right: var(--spacing-sm);
+  transition: background-color var(--transition);
 }
 
 button:hover {
-  background: #f5f5f5;
+  background: var(--color-background-hover);
 }
 
 thead input {
@@ -56,23 +87,22 @@ thead input {
   font-family: inherit;
   font-size: inherit;
 }
+
 thead input:focus {
   outline: 1px solid #aaa;
-  background: #fff;
+  background: var(--color-background-white);
 }
 
-.positive {
-  color: #56a15a;
-}
-.negative {
-  color: #bc4f4f;
-}
+/* Color utility classes */
+.positive { color: var(--color-primary); }
+.negative { color: var(--color-secondary); }
 
+/* Layout components */
 .form-grid {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-md);
   flex-wrap: wrap;
-  margin: 1rem 0;
+  margin: var(--spacing-md) 0;
 }
 
 .form-grid input[type="checkbox"] {
@@ -80,24 +110,24 @@ thead input:focus {
 }
 
 .form-section {
-  border-top: 2px solid #ccc;
-  padding-top: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-tr.game-separator td {
-  border-bottom: 2px solid #aaa; /* subtle line */
+  border-top: 2px solid var(--color-border-light);
+  padding-top: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
 }
 
 .points-control {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .points-control input {
   width: 60px;
   text-align: center;
+}
+
+tr.game-separator td {
+  border-bottom: 2px solid #aaa;
 }
 
 /* Hide number input arrows */
@@ -111,19 +141,21 @@ input[type="number"] {
   appearance: textfield;
 }
 
+/* Button variants */
 .winner-button {
-  padding: 0.5rem 1rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid #888;
-  background: #fff;
+  background: var(--color-background-white);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   text-align: center;
   user-select: none;
+  transition: all var(--transition);
 }
 
 .winner-button.active {
-  background-color: #c8e6c9; /* light green */
-  border-color: #56a15a;
+  background-color: #c8e6c9;
+  border-color: var(--color-primary);
   color: #2e7d32;
 }
 
@@ -133,10 +165,11 @@ input[type="number"] {
   padding: 0;
   cursor: pointer;
   color: #444;
+  transition: color var(--transition);
 }
 
 .icon-button:hover {
-  color: #56a15a;
+  color: var(--color-primary);
 }
 
 /* Modal styles */
@@ -144,10 +177,7 @@ input[type="number"] {
   display: none;
   position: fixed;
   z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -156,7 +186,7 @@ input[type="number"] {
   margin: 5% auto;
   padding: 0;
   border: 1px solid #888;
-  border-radius: 8px;
+  border-radius: var(--border-radius-large);
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
@@ -167,10 +197,10 @@ input[type="number"] {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #ddd;
-  background-color: #f8f8f8;
-  border-radius: 8px 8px 0 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
 }
 
 .modal-header h2 {
@@ -183,55 +213,59 @@ input[type="number"] {
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: #666;
+  color: var(--color-text-muted);
   padding: 0;
   width: 2rem;
   height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color var(--transition);
 }
 
 .modal-close:hover {
-  color: #333;
+  color: var(--color-text);
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: var(--spacing-lg);
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #ddd;
-  background-color: #f8f8f8;
-  border-radius: 0 0 8px 8px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-background-light);
+  border-radius: 0 0 var(--border-radius-large) var(--border-radius-large);
 }
 
+/* Modal button variants */
 .modal-add-button {
-  background: #56a15a;
+  background: var(--color-primary);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  padding: 0.75rem var(--spacing-lg);
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 16px;
+  transition: background-color var(--transition);
 }
 
 .modal-add-button:hover {
-  background: #4a8c4f;
+  background: var(--color-primary-dark);
 }
 
 .modal-cancel-button {
-  background: #f5f5f5;
-  color: #333;
-  border: 1px solid #ccc;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  background: var(--color-background-hover);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-light);
+  padding: 0.75rem var(--spacing-lg);
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 16px;
+  transition: background-color var(--transition);
 }
 
 .modal-cancel-button:hover {
@@ -239,17 +273,18 @@ input[type="number"] {
 }
 
 .modal-confirm-button {
-  background: #bc4f4f;
+  background: var(--color-secondary);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  padding: 0.75rem var(--spacing-lg);
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 16px;
+  transition: background-color var(--transition);
 }
 
 .modal-confirm-button:hover {
-  background: #a03d3d;
+  background: var(--color-secondary-dark);
 }
 
 /* Toast notification styles */
@@ -262,11 +297,11 @@ input[type="number"] {
 }
 
 .toast {
-  background: #bc4f4f;
+  background: var(--color-secondary);
   color: white;
-  padding: 1rem 1.5rem;
+  padding: var(--spacing-md) var(--spacing-lg);
   border-radius: 6px;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateX(100%);
   transition: transform 0.3s ease;
@@ -278,21 +313,14 @@ input[type="number"] {
   transform: translateX(0);
 }
 
-.toast.success {
-  background: #56a15a;
-}
+.toast.success { background: var(--color-success); }
+.toast.warning { background: var(--color-warning); }
+.toast.info { background: var(--color-info); }
 
-.toast.warning {
-  background: #f39c12;
-}
-
-.toast.info {
-  background: #3498db;
-}
-
+/* Add round button styles */
 .add-round-row td {
   text-align: center;
-  padding: 1rem;
+  padding: var(--spacing-md);
   border: none;
 }
 
@@ -300,14 +328,14 @@ input[type="number"] {
   background: #e8f5e8;
   color: #2e7d32;
   border: 1px solid #c8e6c9;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 16px;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: background-color 0.2s;
+  gap: var(--spacing-sm);
+  transition: background-color var(--transition);
 }
 
 .add-round-button:hover {
@@ -317,9 +345,9 @@ input[type="number"] {
 /* Empty state styling */
 .empty-state {
   text-align: center;
-  padding: 2rem 1rem !important;
-  background: #f9f9f9;
-  border: 2px dashed #ccc;
+  padding: var(--spacing-xl) var(--spacing-md) !important;
+  background: var(--color-background-lighter);
+  border: 2px dashed var(--color-border-light);
 }
 
 .empty-message {
@@ -328,132 +356,137 @@ input[type="number"] {
 }
 
 .empty-message p {
-  margin: 0 0 1rem 0;
-  color: #666;
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-text-muted);
   font-size: 14px;
   line-height: 1.4;
 }
 
 .add-round-button.prominent {
-  background: #56a15a;
+  background: var(--color-primary);
   color: white;
   border: none;
-  padding: 1rem 2rem;
+  padding: var(--spacing-md) var(--spacing-xl);
   border-radius: 6px;
   font-size: 16px;
   font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
 }
 
 .add-round-button.prominent:hover {
-  background: #4a8c4f;
+  background: var(--color-primary-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-large);
 }
 
 /* Mobile improvements */
 @media (max-width: 600px) {
-  /* Increase base font size */
+  :root {
+    --spacing-md: 1.25rem;
+    --spacing-lg: 1.5rem;
+    --border-radius: 8px;
+  }
+  
   body {
     font-size: 18px;
-    margin: 1rem auto;
-    padding: 0 0.5rem;
+    margin: var(--spacing-md) auto;
+    padding: 0 var(--spacing-sm);
   }
   
   h1 {
     font-size: 28px;
-    margin-bottom: 1rem;
+    margin-bottom: var(--spacing-md);
   }
   
   h2 {
     font-size: 22px;
   }
   
-  /* Make buttons much larger and more touch-friendly */
+  /* Touch-friendly buttons */
   button {
-    padding: 1.25rem 2rem;
+    padding: 1.25rem var(--spacing-xl);
     font-size: 20px;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
   }
   
   .winner-button {
-    padding: 1.25rem 1rem;
+    padding: 1.25rem var(--spacing-md);
     font-size: 18px;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
   }
   
-  /* Make table cells much more readable */
+  /* Larger table cells */
   th, td {
     padding: 1.25rem 0.75rem;
     font-size: 18px;
   }
   
-  /* Make form inputs larger */
+  /* Larger form inputs */
   .points-control input {
     width: 120px;
     font-size: 20px;
-    padding: 1rem;
-    border-radius: 8px;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
   }
   
   thead input {
     font-size: 18px;
-    padding: 1rem 0.5rem;
+    padding: var(--spacing-md) var(--spacing-sm);
   }
   
-  /* Improve form spacing */
+  /* Improved form spacing */
   .form-section {
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
   }
   
   .form-grid {
-    gap: 1.5rem;
-    margin: 1.5rem 0;
+    gap: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
   }
   
-  /* Make legends more prominent */
+  /* Prominent legends */
   legend {
     font-size: 20px;
     font-weight: bold;
-    padding: 0 0.5rem;
+    padding: 0 var(--spacing-sm);
   }
   
-  /* Improve checkbox styling */
+  /* Larger checkboxes */
   .form-grid input[type="checkbox"] {
     transform: scale(1.5);
-    margin-right: 0.5rem;
+    margin-right: var(--spacing-sm);
   }
   
   .form-grid label {
     font-size: 18px;
   }
   
-  /* Make icon buttons larger */
+  /* Larger icon buttons */
   .icon-button {
-    padding: 0.5rem;
+    padding: var(--spacing-sm);
     font-size: 20px;
   }
   
-  /* Style add-round button for mobile */
+  /* Mobile add-round button */
   .add-round-button {
-    padding: 1rem 1.5rem;
+    padding: var(--spacing-md) var(--spacing-lg);
     font-size: 18px;
   }
   
   .add-round-row td {
-    padding: 1rem;
+    padding: var(--spacing-md);
   }
   
-  /* Mobile empty state styling */
+  /* Mobile empty state */
   .empty-state {
-    padding: 2.5rem 1rem !important;
+    padding: 2.5rem var(--spacing-md) !important;
   }
   
   .empty-message p {
     font-size: 16px;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--spacing-lg);
   }
   
   .add-round-button.prominent {
