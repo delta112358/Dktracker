@@ -69,46 +69,39 @@ function renderTable() {
 
 
 function editRound(index) {
-  const tbody = document.querySelector("#scoreTable tbody");
-  let row = tbody.rows[index];
-  let round = gameState.rounds[index];
-
-  row.innerHTML =
-    `<td>${round.solo ? "S" : index + 1}</td>` +
-    round.scores
-      .map(
-        (s, i) =>
-          `<td><input type='number' id='edit${index}_${i}' value='${s}'></td>`
-      )
-      .join("") +
-    `<td><input type='number' id='editPoints${index}' value='${round.points}'></td>` +
-    `<td><button onclick='saveRound(${index})'>Save</button> <button onclick='renderTable()'>Cancel</button></td>`;
+  const round = gameState.rounds[index];
+  
+  // Store the index of the round being edited
+  window.editingRoundIndex = index;
+  
+  // Open modal in edit mode
+  openAddRoundModal(true);
+  
+  // Pre-fill the modal with existing round data
+  document.getElementById('modalRoundPoints').value = round.points;
+  document.getElementById('modalSoloRound').checked = round.solo;
+  
+  // Pre-select winner buttons based on original round data
+  // Determine winners from the original scores
+  const winners = round.scores.map(score => score > 0);
+  
+  // Build modal winner buttons first, then set their states
+  buildModalWinnerButtons();
+  
+  // Set the winner button states after they're built
+  setTimeout(() => {
+    modalWinnerButtons.forEach((btn, i) => {
+      if (winners[i]) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
+      }
+    });
+  }, 0);
 }
 
-function saveRound(index) {
-  let newPoints = parseInt(
-    document.getElementById(`editPoints${index}`).value,
-    10
-  );
-  if (isNaN(newPoints) || newPoints < 0) {
-    return alert("Enter a valid point value (0 or greater).");
-  }
-
-  let newScores = [];
-  for (let i = 0; i < 4; i++) {
-    let val = parseInt(document.getElementById(`edit${index}_${i}`).value, 10);
-    if (isNaN(val)) {
-      return alert("All scores must be valid numbers.");
-    }
-    newScores.push(val);
-  }
-  gameState.rounds[index] = {
-    points: newPoints,
-    scores: newScores,
-    solo: gameState.rounds[index].solo,
-  };
-  renderTable();
-}
 
 function resetGame() {
   if (confirm("Are you sure you want to reset all scores?")) {
@@ -173,22 +166,40 @@ const svgPlus = `
 </svg>`;
 
 // Modal functions
-function openAddRoundModal() {
+function openAddRoundModal(isEditMode = false) {
   const modal = document.getElementById('addRoundModal');
   modal.style.display = 'block';
+  
+  // Update modal title and button text based on mode
+  const modalTitle = document.querySelector('.modal-header h2');
+  const modalButton = document.getElementById('modalAddRound');
+  
+  if (isEditMode) {
+    modalTitle.textContent = 'Edit Round';
+    modalButton.textContent = 'Save Edits';
+  } else {
+    modalTitle.textContent = 'Add Round';
+    modalButton.textContent = 'Add Round';
+    // Reset modal form only for new rounds
+    document.getElementById('modalRoundPoints').value = '1';
+    document.getElementById('modalSoloRound').checked = false;
+  }
   
   // Build modal winner buttons
   buildModalWinnerButtons();
   
-  // Reset modal form
-  document.getElementById('modalRoundPoints').value = '1';
-  document.getElementById('modalSoloRound').checked = false;
-  modalWinnerButtons.forEach(btn => btn.classList.remove('active'));
+  // Reset winner buttons only for new rounds
+  if (!isEditMode) {
+    modalWinnerButtons.forEach(btn => btn.classList.remove('active'));
+  }
 }
 
 function closeAddRoundModal() {
   const modal = document.getElementById('addRoundModal');
   modal.style.display = 'none';
+  
+  // Clear editing state
+  window.editingRoundIndex = undefined;
 }
 
 function buildModalWinnerButtons() {
@@ -250,7 +261,15 @@ function addRoundFromModal() {
     scores = winners.map((w) => (w ? points : -points));
   }
 
-  gameState.rounds.push({ points: points, scores: scores, solo: solo });
+  // Check if we're editing an existing round
+  if (window.editingRoundIndex !== undefined) {
+    // Update existing round
+    gameState.rounds[window.editingRoundIndex] = { points: points, scores: scores, solo: solo };
+    window.editingRoundIndex = undefined; // Clear the editing index
+  } else {
+    // Add new round
+    gameState.rounds.push({ points: points, scores: scores, solo: solo });
+  }
   
   closeAddRoundModal();
   renderTable();
