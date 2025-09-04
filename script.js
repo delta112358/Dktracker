@@ -180,16 +180,28 @@ function resetGame() {
 }
 
 function exportGame() {
+  // CSV header: Round, player names, then Points column
   let csv = "Round," + gameState.players.join(",") + ",Points\n";
+
+  // Initialize totals array to track cumulative scores per player
+  let totals = [0, 0, 0, 0];
+
   gameState.rounds.forEach((round, idx) => {
-    csv +=
-      (round.solo ? "S" : idx + 1) +
-      "," +
-      round.scores.join(",") +
-      "," +
-      round.points +
-      "\n";
+    // Update totals with this round's scores
+    round.scores.forEach((score, i) => {
+      totals[i] += score;
+    });
+
+    // Compose CSV row:
+    // Round label: "S" for solo, otherwise round index + 1
+    // Then totals (running scores)
+    // Then round.points
+    let roundLabel = round.solo ? "S" : idx + 1;
+
+    csv += roundLabel + "," + totals.join(",") + "," + round.points + "\n";
   });
+
+  // Create downloadable CSV file as before
   let blob = new Blob([csv], { type: "text/csv" });
   let url = URL.createObjectURL(blob);
   let a = document.createElement("a");
