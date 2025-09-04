@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doppelkopf Scoreboard</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="mystyle.css" />
@@ -9,20 +10,22 @@
   <body>
     <h1>Doppelkopf Scoreboard</h1>
 
-    <table id="scoreTable">
-      <thead>
-        <tr>
-          <th>Round</th>
-          <th><input type="text" id="player0" placeholder="Player 1" /></th>
-          <th><input type="text" id="player1" placeholder="Player 2" /></th>
-          <th><input type="text" id="player2" placeholder="Player 3" /></th>
-          <th><input type="text" id="player3" placeholder="Player 4" /></th>
-          <th>Round Points</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-container">
+      <table id="scoreTable">
+        <thead>
+          <tr>
+            <th class="round-header">Round</th>
+            <th><input type="text" id="player0" placeholder="Player 1" /></th>
+            <th><input type="text" id="player1" placeholder="Player 2" /></th>
+            <th><input type="text" id="player2" placeholder="Player 3" /></th>
+            <th><input type="text" id="player3" placeholder="Player 4" /></th>
+            <th class="points-header">Round Points</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
 
     <section class="form-section">
