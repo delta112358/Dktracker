@@ -5,7 +5,6 @@
     <title>Doppelkopf Scoreboard</title>
     <link rel="stylesheet" href="mystyle.css" />
   </head>
-
   <body>
     <h1>Doppelkopf Scoreboard</h1>
 
@@ -22,25 +21,51 @@
         </tr>
       </thead>
       <tbody></tbody>
-
     </table>
 
     <section class="form-section">
       <h2>Add Round</h2>
-      <label>
-        Round Points:
-        <div class="points-control">
-          <button type="button" id="decreasePoints">−</button>
-          <input type="number" id="roundPoints" value="1" min="1" />
-          <button type="button" id="increasePoints">+</button>
-        </div>
-      </label>
-
-      <div class="form-grid" id="winnerButtonsContainer">
-        <!-- Buttons get injected via JavaScript -->
+      <div class="points-control">
+        <label for="roundPoints">Round Points:</label>
+        <button type="button" id="decreasePoints" aria-label="Decrease points">
+          −
+        </button>
+        <input
+          type="number"
+          id="roundPoints"
+          value="1"
+          min="1"
+          aria-labelledby="roundPointsLabel"
+        />
+        <button type="button" id="increasePoints" aria-label="Increase points">
+          +
+        </button>
       </div>
 
-      <label> <input type="checkbox" id="soloRound" /> Solo </label>
+
+
+
+      <fieldset
+        class="form-grid"
+        id="winnerButtonsContainer"
+        aria-label="Winner selection"
+      >
+        <legend>Winner Selection</legend>
+        <!-- Winner buttons injected by JavaScript -->
+      </fieldset>
+
+      <fieldset
+        class="form-grid"
+        id="conditionButtonsContainer"
+        aria-label="Special conditions"
+      >
+        <legend>Special Conditions</legend>
+        <label>
+          <input type="checkbox" id="soloRound" />
+          Solo
+        </label>
+      </fieldset>
+
       <button type="button" id="addRound">Add Round</button>
     </section>
 
@@ -52,5 +77,4 @@
 
     <script src="script.js"></script>
   </body>
-  version 1.3
 </html>

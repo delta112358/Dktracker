@@ -68,17 +68,11 @@ thead input:focus {
   color: #bc4f4f;
 }
 
-.form-section {
-  border-top: 2px solid #ccc;
-  padding-top: 1.5rem;
-  margin-top: 1.5rem;
-}
-
 .form-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
 }
 
 .form-grid input[type="checkbox"] {
@@ -89,13 +83,6 @@ thead input:focus {
   border-top: 2px solid #ccc;
   padding-top: 1.5rem;
   margin-top: 1.5rem;
-}
-
-.form-grid {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin: 1rem 0;
 }
 
 tr.game-separator td {
@@ -139,7 +126,6 @@ input[type="number"] {
   border-color: #56a15a;
   color: #2e7d32;
 }
-
 
 .icon-button {
   background: none;
