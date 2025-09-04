@@ -84,7 +84,7 @@ function renderTable() {
     });
 
     rowHtml += `<td>${round.points}</td>`;
-    rowHtml += `<td><button onclick='editRound(${index})'>Edit</button></td>`;
+    rowHtml += `<td><button onclick='editRound(${index})' aria-label="Edit round" class="icon-button">${svgPencil}</button></td>`;
     tr.innerHTML = rowHtml;
 
     // Add separator after every 4th non-solo round
@@ -94,7 +94,6 @@ function renderTable() {
 
     tbody.appendChild(tr);
   });
-
 
   saveState();
 }
@@ -225,6 +224,11 @@ document.getElementById("decreasePoints").addEventListener("click", () => {
   let newValue = parseInt(input.value || "1") - 1;
   input.value = Math.max(newValue, 1); // prevent < 1
 });
+
+const svgPencil = `
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2L3 10.207V13h2.793L14 4.793 11.207 2z"/>
+</svg>`;
 
 // Initialize on page load
 loadState();

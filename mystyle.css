@@ -139,3 +139,16 @@ input[type="number"] {
   border-color: #56a15a;
   color: #2e7d32;
 }
+
+
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #444;
+}
+
+.icon-button:hover {
+  color: #56a15a;
+}
