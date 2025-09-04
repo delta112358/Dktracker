@@ -95,9 +95,6 @@ function renderTable() {
     tbody.appendChild(tr);
   });
 
-  totals.forEach((t, i) => {
-    document.getElementById("total" + i).textContent = t;
-  });
 
   saveState();
 }
