@@ -62,7 +62,11 @@ function loadState() {
     gameState = JSON.parse(saved);
     for (let i = 0; i < 4; i++) {
       let input = document.getElementById("player" + i);
-      input.value = gameState.players[i];
+      if (gameState.players[i] && gameState.players[i] !== `Player ${i + 1}`) {
+        input.value = gameState.players[i];
+      } else {
+        input.value = input.placeholder; // Show placeholder for default names
+      }
     }
   }
 }
@@ -71,8 +75,19 @@ function renderTable() {
   // Update player names from inputs and sync to gameState
   for (let i = 0; i < 4; i++) {
     let input = document.getElementById("player" + i);
-    gameState.players[i] = input.value.trim() || `Player ${i + 1}`;
-    if (!input.value.trim()) input.value = gameState.players[i];
+    let currentValue = input.value.trim();
+    
+    // If the input contains placeholder text, treat it as empty
+    if (currentValue === input.placeholder) {
+      currentValue = "";
+    }
+    
+    gameState.players[i] = currentValue || `Player ${i + 1}`;
+    
+    // If the field is empty, show placeholder
+    if (!currentValue) {
+      input.value = input.placeholder;
+    }
   }
 
 
@@ -206,6 +221,21 @@ function exportGame() {
 // Add event listeners for player name inputs to persist changes immediately
 for (let i = 0; i < 4; i++) {
   const playerInput = document.getElementById("player" + i);
+  
+  // Handle placeholder behavior - clear placeholder on focus
+  playerInput.addEventListener("focus", () => {
+    if (playerInput.value === playerInput.placeholder) {
+      playerInput.value = "";
+    }
+  });
+  
+  // Restore placeholder if field becomes empty
+  playerInput.addEventListener("blur", () => {
+    if (playerInput.value.trim() === "") {
+      playerInput.value = playerInput.placeholder;
+    }
+  });
+  
   playerInput.addEventListener("input", () => {
     gameState.players[i] = playerInput.value.trim() || `Player ${i + 1}`;
     saveState();
