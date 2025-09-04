@@ -116,8 +116,8 @@ function renderTable() {
 
 function addRound() {
   let points = parseInt(document.getElementById("roundPoints").value, 10);
-  if (isNaN(points) || points <= 0)
-    return alert("Enter a valid positive point value.");
+  if (isNaN(points) || points < 0)
+    return alert("Enter a valid point value (0 or greater).");
 
   let solo = document.getElementById("soloRound").checked;
 
@@ -168,8 +168,8 @@ function saveRound(index) {
     document.getElementById(`editPoints${index}`).value,
     10
   );
-  if (isNaN(newPoints) || newPoints <= 0) {
-    return alert("Enter a valid positive point value.");
+  if (isNaN(newPoints) || newPoints < 0) {
+    return alert("Enter a valid point value (0 or greater).");
   }
 
   let newScores = [];
@@ -250,7 +250,7 @@ document.getElementById("increasePoints").addEventListener("click", () => {
 document.getElementById("decreasePoints").addEventListener("click", () => {
   let input = document.getElementById("roundPoints");
   let newValue = parseInt(input.value || "1") - 1;
-  input.value = Math.max(newValue, 1); // prevent < 1
+  input.value = Math.max(newValue, 0); // prevent < 0
 });
 
 const svgPencil = `
