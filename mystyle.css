@@ -123,3 +123,19 @@ input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
   appearance: textfield;
 }
+
+.winner-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #888;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  user-select: none;
+}
+
+.winner-button.active {
+  background-color: #c8e6c9; /* light green */
+  border-color: #56a15a;
+  color: #2e7d32;
+}

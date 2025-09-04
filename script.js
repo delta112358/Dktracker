@@ -7,11 +7,49 @@ function saveState() {
   localStorage.setItem("dokoGame", JSON.stringify(gameState));
 }
 
+// References the container where winner buttons will be placed
+const winnerButtonsContainer = document.getElementById(
+  "winnerButtonsContainer"
+);
+
+// Keep an array to track winner button elements for easy reference
+let winnerButtons = [];
+
+// Function to build or rebuild winner buttons based on current player names (called once on load)
+function buildWinnerButtons() {
+  winnerButtonsContainer.innerHTML = "";
+  winnerButtons = [];
+
+  gameState.players.forEach((playerName, index) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = playerName;
+    btn.className = "winner-button";
+    btn.dataset.playerIndex = index;
+
+    btn.addEventListener("click", () => {
+      // Toggle active state on button click
+      btn.classList.toggle("active");
+      // Optional for accessibility: toggle aria-pressed
+      btn.setAttribute("aria-pressed", btn.classList.contains("active"));
+    });
+
+    winnerButtonsContainer.appendChild(btn);
+    winnerButtons.push(btn);
+  });
+}
+
+// Function to update winner button labels to reflect player name changes without rebuilding buttons
+function updateWinnerButtonLabels() {
+  winnerButtons.forEach((btn, i) => {
+    btn.textContent = gameState.players[i];
+  });
+}
+
 function loadState() {
   let saved = localStorage.getItem("dokoGame");
   if (saved) {
     gameState = JSON.parse(saved);
-    // Update player name inputs to loaded names
     for (let i = 0; i < 4; i++) {
       let input = document.getElementById("player" + i);
       input.value = gameState.players[i];
@@ -24,9 +62,10 @@ function renderTable() {
   for (let i = 0; i < 4; i++) {
     let input = document.getElementById("player" + i);
     gameState.players[i] = input.value.trim() || `Player ${i + 1}`;
-    // Ensure input reflects fallback if empty
     if (!input.value.trim()) input.value = gameState.players[i];
   }
+
+  // Do NOT rebuild winner buttons here to preserve active states
 
   const tbody = document.querySelector("#scoreTable tbody");
   tbody.innerHTML = "";
@@ -70,10 +109,8 @@ function addRound() {
 
   let solo = document.getElementById("soloRound").checked;
 
-  let winners = [];
-  for (let i = 0; i < 4; i++) {
-    winners[i] = document.getElementById("winner" + i).checked;
-  }
+  // Determine winners by active buttons
+  let winners = winnerButtons.map((btn) => btn.classList.contains("active"));
 
   if (!winners.includes(true)) return alert("Select at least one winner.");
   if (solo && winners.filter((w) => w).length !== 1)
@@ -81,20 +118,18 @@ function addRound() {
 
   let scores;
   if (solo) {
-    // Solo round: winner gets points*3, others lose points
     scores = winners.map((w) => (w ? points * 3 : -points));
   } else {
-    // Normal round
     scores = winners.map((w) => (w ? points : -points));
   }
 
   gameState.rounds.push({ points: points, scores: scores, solo: solo });
 
-  // Reset form
-  document.getElementById("roundPoints").value = "1"; // reset to default 1
+  // Reset form inputs
+  document.getElementById("roundPoints").value = "1";
   document.getElementById("soloRound").checked = false;
-  for (let i = 0; i < 4; i++)
-    document.getElementById("winner" + i).checked = false;
+  // Clear active states on winner buttons
+  winnerButtons.forEach((btn) => btn.classList.remove("active"));
 
   renderTable();
 }
@@ -168,12 +203,13 @@ function exportGame() {
   URL.revokeObjectURL(url);
 }
 
-// Add event listeners for player name inputs to persist changes immediately
+// Add event listeners for player name inputs to persist changes immediately and update winner buttons labels
 for (let i = 0; i < 4; i++) {
   const playerInput = document.getElementById("player" + i);
   playerInput.addEventListener("input", () => {
     gameState.players[i] = playerInput.value.trim() || `Player ${i + 1}`;
     saveState();
+    updateWinnerButtonLabels(); // update button labels but do not rebuild buttons
   });
 }
 
@@ -193,6 +229,7 @@ document.getElementById("decreasePoints").addEventListener("click", () => {
   input.value = Math.max(newValue, 1); // prevent < 1
 });
 
-// Initialize
+// Initialize on page load
 loadState();
+buildWinnerButtons(); // build winner buttons once here
 renderTable();
