@@ -34,6 +34,18 @@
       <button type="button" id="exportGame">Export</button>
     </section>
 
+    <section class="form-section">
+      <h2>
+        Score Evolution
+        <button type="button" id="toggleGraph" class="toggle-button" aria-label="Toggle score graph">
+          <span class="toggle-icon">▼</span>
+        </button>
+      </h2>
+      <div id="graphContainer" class="graph-container" style="display: none;">
+        <div id="scoreGraph" class="score-graph"></div>
+      </div>
+    </section>
+
     <!-- Add Round Modal -->
     <div id="addRoundModal" class="modal">
       <div class="modal-content">

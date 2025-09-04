@@ -183,6 +183,12 @@ function resetGame() {
     gameState.rounds = [];
     renderTable();
     showToast("Game has been reset successfully.", "success");
+    
+    // Update graph if it's visible
+    const graphContainer = document.getElementById("graphContainer");
+    if (graphContainer.style.display !== "none") {
+      updateGraph();
+    }
   });
 }
 
@@ -244,6 +250,9 @@ for (let i = 0; i < 4; i++) {
 
 document.getElementById("resetGame").addEventListener("click", resetGame);
 document.getElementById("exportGame").addEventListener("click", exportGame);
+
+// Graph functionality
+document.getElementById("toggleGraph").addEventListener("click", toggleGraph);
 
 
 const svgPencil = `
@@ -371,6 +380,12 @@ function addRoundFromModal() {
   
   closeAddRoundModal();
   renderTable();
+  
+  // Update graph if it's visible
+  const graphContainer = document.getElementById("graphContainer");
+  if (graphContainer.style.display !== "none") {
+    updateGraph();
+  }
 }
 
 // Modal event listeners
@@ -403,6 +418,217 @@ document.getElementById('modalDecreasePoints').addEventListener('click', () => {
   let newValue = parseInt(input.value || '1') - 1;
   input.value = Math.max(newValue, 0);
 });
+
+// Graph functionality
+function toggleGraph() {
+  const container = document.getElementById("graphContainer");
+  const icon = document.querySelector(".toggle-icon");
+  const isVisible = container.style.display !== "none";
+  
+  if (isVisible) {
+    container.style.display = "none";
+    icon.classList.remove("expanded");
+  } else {
+    container.style.display = "block";
+    icon.classList.add("expanded");
+    updateGraph();
+  }
+}
+
+function updateGraph() {
+  const graphContainer = document.getElementById("scoreGraph");
+  const rounds = gameState.rounds;
+  
+  if (rounds.length === 0) {
+    graphContainer.innerHTML = '<p style="text-align: center; color: var(--color-text-muted); padding: 2rem;">No rounds yet. Add some rounds to see the score evolution!</p>';
+    return;
+  }
+  
+  // Calculate cumulative scores for each player
+  const cumulativeScores = [[0], [0], [0], [0]]; // Start with 0 for each player
+  
+  rounds.forEach(round => {
+    for (let i = 0; i < 4; i++) {
+      const previousScore = cumulativeScores[i][cumulativeScores[i].length - 1];
+      const roundScore = round.scores[i] || 0;
+      cumulativeScores[i].push(previousScore + roundScore);
+    }
+  });
+  
+  // Graph dimensions and padding
+  const width = Math.max(400, rounds.length * 60 + 100);
+  const height = 300;
+  const padding = { top: 20, right: 40, bottom: 40, left: 60 };
+  const graphWidth = width - padding.left - padding.right;
+  const graphHeight = height - padding.top - padding.bottom;
+  
+  // Find min and max scores for scaling
+  const allScores = cumulativeScores.flat();
+  const minScore = Math.min(...allScores);
+  const maxScore = Math.max(...allScores);
+  const scoreRange = maxScore - minScore || 1; // Avoid division by zero
+  
+  // Player colors
+  const colors = ['#56a15a', '#bc4f4f', '#3498db', '#f39c12'];
+  
+  // Create SVG
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", width);
+  svg.setAttribute("height", height);
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  
+  // Create grid lines
+  const gridGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  gridGroup.setAttribute("class", "grid");
+  
+  // Horizontal grid lines
+  for (let i = 0; i <= 5; i++) {
+    const y = padding.top + (graphHeight / 5) * i;
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", padding.left);
+    line.setAttribute("y1", y);
+    line.setAttribute("x2", width - padding.right);
+    line.setAttribute("y2", y);
+    line.setAttribute("stroke", "#e0e0e0");
+    line.setAttribute("stroke-width", "1");
+    gridGroup.appendChild(line);
+    
+    // Y-axis labels
+    const score = maxScore - (scoreRange / 5) * i;
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", padding.left - 10);
+    text.setAttribute("y", y + 4);
+    text.setAttribute("text-anchor", "end");
+    text.setAttribute("font-size", "12");
+    text.setAttribute("fill", "#666");
+    text.textContent = Math.round(score);
+    gridGroup.appendChild(text);
+  }
+  
+  // Vertical grid lines
+  for (let i = 0; i <= rounds.length; i++) {
+    const x = padding.left + (graphWidth / rounds.length) * i;
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x);
+    line.setAttribute("y1", padding.top);
+    line.setAttribute("x2", x);
+    line.setAttribute("y2", height - padding.bottom);
+    line.setAttribute("stroke", "#e0e0e0");
+    line.setAttribute("stroke-width", "1");
+    gridGroup.appendChild(line);
+    
+    // X-axis labels
+    if (i < rounds.length) {
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", x);
+      text.setAttribute("y", height - padding.bottom + 20);
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("font-size", "12");
+      text.setAttribute("fill", "#666");
+      text.textContent = i + 1;
+      gridGroup.appendChild(text);
+    }
+  }
+  
+  svg.appendChild(gridGroup);
+  
+  // Draw lines and points for each player
+  for (let playerIndex = 0; playerIndex < 4; playerIndex++) {
+    const scores = cumulativeScores[playerIndex];
+    const color = colors[playerIndex];
+    
+    // Create path for the line
+    let pathData = "";
+    for (let i = 0; i < scores.length; i++) {
+      const x = padding.left + (graphWidth / (scores.length - 1)) * i;
+      const y = padding.top + graphHeight - ((scores[i] - minScore) / scoreRange) * graphHeight;
+      
+      if (i === 0) {
+        pathData += `M ${x} ${y}`;
+      } else {
+        pathData += ` L ${x} ${y}`;
+      }
+    }
+    
+    // Draw the line
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", pathData);
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width", "2");
+    path.setAttribute("fill", "none");
+    path.setAttribute("class", `player-line player-${playerIndex}`);
+    svg.appendChild(path);
+    
+    // Draw data points
+    for (let i = 0; i < scores.length; i++) {
+      const x = padding.left + (graphWidth / (scores.length - 1)) * i;
+      const y = padding.top + graphHeight - ((scores[i] - minScore) / scoreRange) * graphHeight;
+      
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", x);
+      circle.setAttribute("cy", y);
+      circle.setAttribute("r", "4");
+      circle.setAttribute("fill", color);
+      circle.setAttribute("stroke", "#fff");
+      circle.setAttribute("stroke-width", "2");
+      circle.setAttribute("class", `player-point player-${playerIndex}`);
+      svg.appendChild(circle);
+    }
+  }
+  
+  // Add axis labels
+  const xAxisLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  xAxisLabel.setAttribute("x", width / 2);
+  xAxisLabel.setAttribute("y", height - 5);
+  xAxisLabel.setAttribute("text-anchor", "middle");
+  xAxisLabel.setAttribute("font-size", "14");
+  xAxisLabel.setAttribute("fill", "#333");
+  xAxisLabel.textContent = "Round";
+  svg.appendChild(xAxisLabel);
+  
+  const yAxisLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  yAxisLabel.setAttribute("x", 15);
+  yAxisLabel.setAttribute("y", height / 2);
+  yAxisLabel.setAttribute("text-anchor", "middle");
+  yAxisLabel.setAttribute("font-size", "14");
+  yAxisLabel.setAttribute("fill", "#333");
+  yAxisLabel.setAttribute("transform", `rotate(-90, 15, ${height / 2})`);
+  yAxisLabel.textContent = "Cumulative Score";
+  svg.appendChild(yAxisLabel);
+  
+  // Add legend
+  const legendGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  legendGroup.setAttribute("class", "legend");
+  
+  for (let i = 0; i < 4; i++) {
+    const legendY = 20 + i * 20;
+    
+    // Legend line
+    const legendLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    legendLine.setAttribute("x1", width - 120);
+    legendLine.setAttribute("y1", legendY);
+    legendLine.setAttribute("x2", width - 100);
+    legendLine.setAttribute("y2", legendY);
+    legendLine.setAttribute("stroke", colors[i]);
+    legendLine.setAttribute("stroke-width", "2");
+    legendGroup.appendChild(legendLine);
+    
+    // Legend text
+    const legendText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    legendText.setAttribute("x", width - 95);
+    legendText.setAttribute("y", legendY + 4);
+    legendText.setAttribute("font-size", "12");
+    legendText.setAttribute("fill", "#333");
+    legendText.textContent = gameState.players[i];
+    legendGroup.appendChild(legendText);
+  }
+  
+  svg.appendChild(legendGroup);
+  
+  // Clear and add the new graph
+  graphContainer.innerHTML = "";
+  graphContainer.appendChild(svg);
+}
 
 // Initialize on page load
 loadState();
