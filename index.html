@@ -8,21 +8,27 @@
     <link rel="stylesheet" href="mystyle.css" />
   </head>
   <body>
+    <!-- Skip Navigation -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#scoreboard" class="skip-link">Skip to scoreboard</a>
+    <a href="#controls" class="skip-link">Skip to controls</a>
+    
     <h1>DoppelkopfJS</h1>
 
-    <section class="form-section">
-      <h2>Scoreboard</h2>
+    <main id="main-content">
+      <section class="form-section" id="scoreboard">
+        <h2>Scoreboard</h2>
       <div class="table-container">
-        <table id="scoreTable">
+        <table id="scoreTable" role="table" aria-label="Doppelkopf scoreboard">
           <thead>
             <tr>
-              <th class="round-header">Round</th>
-              <th><input type="text" id="player0" placeholder="Player 1" /></th>
-              <th><input type="text" id="player1" placeholder="Player 2" /></th>
-              <th><input type="text" id="player2" placeholder="Player 3" /></th>
-              <th><input type="text" id="player3" placeholder="Player 4" /></th>
-              <th class="points-header">Round Points</th>
-              <th></th>
+              <th class="round-header" scope="col">Round</th>
+              <th scope="col"><input type="text" id="player0" placeholder="Player 1" aria-label="Player 1 name" /></th>
+              <th scope="col"><input type="text" id="player1" placeholder="Player 2" aria-label="Player 2 name" /></th>
+              <th scope="col"><input type="text" id="player2" placeholder="Player 3" aria-label="Player 3 name" /></th>
+              <th scope="col"><input type="text" id="player3" placeholder="Player 4" aria-label="Player 4 name" /></th>
+              <th class="points-header" scope="col">Round Points</th>
+              <th scope="col" aria-label="Actions">Actions</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -31,23 +37,24 @@
     </section>
 
 
-    <section class="form-section">
-      <h2>Controls</h2>
+      <section class="form-section" id="controls">
+        <h2>Controls</h2>
       <button type="button" id="resetGame">Reset</button>
       <button type="button" id="exportGame">Export</button>
     </section>
 
-    <section class="form-section">
-      <h2>
-        Nerd mode
-        <button type="button" id="toggleGraph" class="toggle-button" aria-label="Toggle score graph">
-          <span class="toggle-icon">▼</span>
-        </button>
-      </h2>
-      <div id="graphContainer" class="graph-container" style="display: none;">
-        <div id="scoreGraph" class="score-graph"></div>
-      </div>
-    </section>
+      <section class="form-section">
+        <h2>
+          Nerd mode
+          <button type="button" id="toggleGraph" class="toggle-button" aria-label="Toggle score graph">
+            <span class="toggle-icon">▼</span>
+          </button>
+        </h2>
+        <div id="graphContainer" class="graph-container" style="display: none;">
+          <div id="scoreGraph" class="score-graph"></div>
+        </div>
+      </section>
+    </main>
 
     <!-- Add Round Modal -->
     <div id="addRoundModal" class="modal">
@@ -105,7 +112,10 @@
     </div>
 
     <!-- Toast notification container -->
-    <div id="toastContainer" class="toast-container"></div>
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+    
+    <!-- Screen reader announcements -->
+    <div id="sr-announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
     <!-- Confirmation Modal -->
     <div id="confirmModal" class="modal">

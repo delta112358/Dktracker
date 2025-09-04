@@ -16,6 +16,8 @@ function showToast(message, type = 'error', duration = 4000) {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.textContent = message;
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'polite');
   
   container.appendChild(toast);
   
@@ -27,6 +29,17 @@ function showToast(message, type = 'error', duration = 4000) {
     toast.classList.remove('show');
     setTimeout(() => container.removeChild(toast), 300);
   }, duration);
+}
+
+// Screen reader announcement function
+function announceToScreenReader(message) {
+  const srContainer = document.getElementById('sr-announcements');
+  srContainer.textContent = message;
+  
+  // Clear after announcement
+  setTimeout(() => {
+    srContainer.textContent = '';
+  }, 1000);
 }
 
 // Confirmation modal functions
