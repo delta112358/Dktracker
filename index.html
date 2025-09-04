@@ -25,22 +25,24 @@
 
     <section class="form-section">
       <h2>Add Round</h2>
-      <div class="points-control">
-        <label for="roundPoints">Round Points:</label>
-        <button type="button" id="decreasePoints" aria-label="Decrease points">
-          −
-        </button>
-        <input
-          type="number"
-          id="roundPoints"
-          value="1"
-          min="1"
-          aria-labelledby="roundPointsLabel"
-        />
-        <button type="button" id="increasePoints" aria-label="Increase points">
-          +
-        </button>
-      </div>
+      <fieldset class="form-grid" aria-label="Round points">
+        <legend>Round Points</legend>
+        <div class="points-control">
+          <button type="button" id="decreasePoints" aria-label="Decrease points">
+            −
+          </button>
+          <input
+            type="number"
+            id="roundPoints"
+            value="1"
+            min="1"
+            aria-labelledby="roundPointsLabel"
+          />
+          <button type="button" id="increasePoints" aria-label="Increase points">
+            +
+          </button>
+        </div>
+      </fieldset>
 
 
 
