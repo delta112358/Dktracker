@@ -138,3 +138,88 @@ input[type="number"] {
 .icon-button:hover {
   color: #56a15a;
 }
+
+/* Mobile improvements */
+@media (max-width: 600px) {
+  /* Increase base font size */
+  body {
+    font-size: 18px;
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
+  
+  h1 {
+    font-size: 28px;
+    margin-bottom: 1rem;
+  }
+  
+  h2 {
+    font-size: 22px;
+  }
+  
+  /* Make buttons much larger and more touch-friendly */
+  button {
+    padding: 1.25rem 2rem;
+    font-size: 20px;
+    border-radius: 8px;
+  }
+  
+  .winner-button {
+    padding: 1.25rem 1rem;
+    font-size: 18px;
+    border-radius: 8px;
+  }
+  
+  /* Make table cells much more readable */
+  th, td {
+    padding: 1.25rem 0.75rem;
+    font-size: 18px;
+  }
+  
+  /* Make form inputs larger */
+  .points-control input {
+    width: 120px;
+    font-size: 20px;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  thead input {
+    font-size: 18px;
+    padding: 1rem 0.5rem;
+  }
+  
+  /* Improve form spacing */
+  .form-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+  
+  .form-grid {
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  
+  /* Make legends more prominent */
+  legend {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0 0.5rem;
+  }
+  
+  /* Improve checkbox styling */
+  .form-grid input[type="checkbox"] {
+    transform: scale(1.5);
+    margin-right: 0.5rem;
+  }
+  
+  .form-grid label {
+    font-size: 18px;
+  }
+  
+  /* Make icon buttons larger */
+  .icon-button {
+    padding: 0.5rem;
+    font-size: 20px;
+  }
+}
