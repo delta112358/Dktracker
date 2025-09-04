@@ -61,7 +61,7 @@ function renderTable() {
   // Add permanent "Add Round" row at the end
   const addRow = document.createElement("tr");
   addRow.className = "add-round-row";
-  addRow.innerHTML = `<td colspan="7"><button onclick='openAddRoundModal()' aria-label="Add new round" class="add-round-button">${svgPlus}</button></td>`;
+  addRow.innerHTML = `<td colspan="7"><button onclick='openAddRoundModal()' aria-label="Add new round" class="add-round-button">Add Round</button></td>`;
   tbody.appendChild(addRow);
 
   saveState();
@@ -230,8 +230,18 @@ function addRoundFromModal() {
   let winners = modalWinnerButtons.map((btn) => btn.classList.contains("active"));
 
   if (!winners.includes(true)) return alert("Select at least one winner.");
-  if (solo && winners.filter((w) => w).length !== 1)
-    return alert("Select exactly one winner for a solo round.");
+  
+  const winnerCount = winners.filter((w) => w).length;
+  
+  if (solo) {
+    if (winnerCount !== 1 && winnerCount !== 3) {
+      return alert("For a solo round, select exactly 1 winner (solo player) or 3 winners (against solo player).");
+    }
+  } else {
+    if (winnerCount !== 2) {
+      return alert("For a normal round, select exactly 2 winners.");
+    }
+  }
 
   let scores;
   if (solo) {
