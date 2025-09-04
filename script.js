@@ -7,54 +7,8 @@ function saveState() {
   localStorage.setItem("dokoGame", JSON.stringify(gameState));
 }
 
-// References the container where winner buttons will be placed
-const winnerButtonsContainer = document.getElementById(
-  "winnerButtonsContainer"
-);
-
-// Keep an array to track winner button elements for easy reference
-let winnerButtons = [];
-
-// Function to build or rebuild winner buttons based on current player names (called once on load)
-function buildWinnerButtons() {
-  // Preserve the legend element by finding it first
-  const legend = winnerButtonsContainer.querySelector('legend');
-  
-  // Clear only the content after the legend
-  winnerButtonsContainer.innerHTML = "";
-  
-  // Restore the legend if it existed
-  if (legend) {
-    winnerButtonsContainer.appendChild(legend);
-  }
-  
-  winnerButtons = [];
-
-  gameState.players.forEach((playerName, index) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = playerName;
-    btn.className = "winner-button";
-    btn.dataset.playerIndex = index;
-
-    btn.addEventListener("click", () => {
-      // Toggle active state on button click
-      btn.classList.toggle("active");
-      // Optional for accessibility: toggle aria-pressed
-      btn.setAttribute("aria-pressed", btn.classList.contains("active"));
-    });
-
-    winnerButtonsContainer.appendChild(btn);
-    winnerButtons.push(btn);
-  });
-}
-
-// Function to update winner button labels to reflect player name changes without rebuilding buttons
-function updateWinnerButtonLabels() {
-  winnerButtons.forEach((btn, i) => {
-    btn.textContent = gameState.players[i];
-  });
-}
+// Keep an array to track modal winner button elements for easy reference
+let modalWinnerButtons = [];
 
 function loadState() {
   let saved = localStorage.getItem("dokoGame");
@@ -75,7 +29,6 @@ function renderTable() {
     if (!input.value.trim()) input.value = gameState.players[i];
   }
 
-  // Do NOT rebuild winner buttons here to preserve active states
 
   const tbody = document.querySelector("#scoreTable tbody");
   tbody.innerHTML = "";
@@ -108,43 +61,12 @@ function renderTable() {
   // Add permanent "Add Round" row at the end
   const addRow = document.createElement("tr");
   addRow.className = "add-round-row";
-  addRow.innerHTML = `<td colspan="7"><button onclick='addRound()' aria-label="Add new round" class="add-round-button">${svgPlus}</button></td>`;
+  addRow.innerHTML = `<td colspan="7"><button onclick='openAddRoundModal()' aria-label="Add new round" class="add-round-button">${svgPlus}</button></td>`;
   tbody.appendChild(addRow);
 
   saveState();
 }
 
-function addRound() {
-  let points = parseInt(document.getElementById("roundPoints").value, 10);
-  if (isNaN(points) || points < 0)
-    return alert("Enter a valid point value (0 or greater).");
-
-  let solo = document.getElementById("soloRound").checked;
-
-  // Determine winners by active buttons
-  let winners = winnerButtons.map((btn) => btn.classList.contains("active"));
-
-  if (!winners.includes(true)) return alert("Select at least one winner.");
-  if (solo && winners.filter((w) => w).length !== 1)
-    return alert("Select exactly one winner for a solo round.");
-
-  let scores;
-  if (solo) {
-    scores = winners.map((w) => (w ? points * 3 : -points));
-  } else {
-    scores = winners.map((w) => (w ? points : -points));
-  }
-
-  gameState.rounds.push({ points: points, scores: scores, solo: solo });
-
-  // Reset form inputs
-  document.getElementById("roundPoints").value = "1";
-  document.getElementById("soloRound").checked = false;
-  // Clear active states on winner buttons
-  winnerButtons.forEach((btn) => btn.classList.remove("active"));
-
-  renderTable();
-}
 
 function editRound(index) {
   const tbody = document.querySelector("#scoreTable tbody");
@@ -227,31 +149,18 @@ function exportGame() {
   URL.revokeObjectURL(url);
 }
 
-// Add event listeners for player name inputs to persist changes immediately and update winner buttons labels
+// Add event listeners for player name inputs to persist changes immediately
 for (let i = 0; i < 4; i++) {
   const playerInput = document.getElementById("player" + i);
   playerInput.addEventListener("input", () => {
     gameState.players[i] = playerInput.value.trim() || `Player ${i + 1}`;
     saveState();
-    updateWinnerButtonLabels(); // update button labels but do not rebuild buttons
   });
 }
 
-document.getElementById("addRound").addEventListener("click", addRound);
 document.getElementById("resetGame").addEventListener("click", resetGame);
 document.getElementById("exportGame").addEventListener("click", exportGame);
 
-// Points adjustment buttons
-document.getElementById("increasePoints").addEventListener("click", () => {
-  let input = document.getElementById("roundPoints");
-  input.value = parseInt(input.value || "1") + 1;
-});
-
-document.getElementById("decreasePoints").addEventListener("click", () => {
-  let input = document.getElementById("roundPoints");
-  let newValue = parseInt(input.value || "1") - 1;
-  input.value = Math.max(newValue, 0); // prevent < 0
-});
 
 const svgPencil = `
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -263,7 +172,104 @@ const svgPlus = `
   <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
 </svg>`;
 
+// Modal functions
+function openAddRoundModal() {
+  const modal = document.getElementById('addRoundModal');
+  modal.style.display = 'block';
+  
+  // Build modal winner buttons
+  buildModalWinnerButtons();
+  
+  // Reset modal form
+  document.getElementById('modalRoundPoints').value = '1';
+  document.getElementById('modalSoloRound').checked = false;
+  modalWinnerButtons.forEach(btn => btn.classList.remove('active'));
+}
+
+function closeAddRoundModal() {
+  const modal = document.getElementById('addRoundModal');
+  modal.style.display = 'none';
+}
+
+function buildModalWinnerButtons() {
+  const modalWinnerButtonsContainer = document.getElementById('modalWinnerButtonsContainer');
+  const legend = modalWinnerButtonsContainer.querySelector('legend');
+  
+  modalWinnerButtonsContainer.innerHTML = '';
+  if (legend) {
+    modalWinnerButtonsContainer.appendChild(legend);
+  }
+  
+  modalWinnerButtons = [];
+
+  gameState.players.forEach((playerName, index) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = playerName;
+    btn.className = "winner-button";
+    btn.dataset.playerIndex = index;
+
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("active");
+      btn.setAttribute("aria-pressed", btn.classList.contains("active"));
+    });
+
+    modalWinnerButtonsContainer.appendChild(btn);
+    modalWinnerButtons.push(btn);
+  });
+}
+
+function addRoundFromModal() {
+  let points = parseInt(document.getElementById("modalRoundPoints").value, 10);
+  if (isNaN(points) || points < 0)
+    return alert("Enter a valid point value (0 or greater).");
+
+  let solo = document.getElementById("modalSoloRound").checked;
+
+  // Determine winners by active modal buttons
+  let winners = modalWinnerButtons.map((btn) => btn.classList.contains("active"));
+
+  if (!winners.includes(true)) return alert("Select at least one winner.");
+  if (solo && winners.filter((w) => w).length !== 1)
+    return alert("Select exactly one winner for a solo round.");
+
+  let scores;
+  if (solo) {
+    scores = winners.map((w) => (w ? points * 3 : -points));
+  } else {
+    scores = winners.map((w) => (w ? points : -points));
+  }
+
+  gameState.rounds.push({ points: points, scores: scores, solo: solo });
+  
+  closeAddRoundModal();
+  renderTable();
+}
+
+// Modal event listeners
+document.getElementById('modalAddRound').addEventListener('click', addRoundFromModal);
+document.querySelector('.modal-cancel-button').addEventListener('click', closeAddRoundModal);
+document.querySelector('.modal-close').addEventListener('click', closeAddRoundModal);
+
+// Close modal when clicking outside of it
+document.getElementById('addRoundModal').addEventListener('click', (e) => {
+  if (e.target.id === 'addRoundModal') {
+    closeAddRoundModal();
+  }
+});
+
+// Modal points adjustment buttons
+document.getElementById('modalIncreasePoints').addEventListener('click', () => {
+  let input = document.getElementById('modalRoundPoints');
+  input.value = parseInt(input.value || '1') + 1;
+});
+
+document.getElementById('modalDecreasePoints').addEventListener('click', () => {
+  let input = document.getElementById('modalRoundPoints');
+  let newValue = parseInt(input.value || '1') - 1;
+  input.value = Math.max(newValue, 0);
+});
+
 // Initialize on page load
 loadState();
-buildWinnerButtons(); // build winner buttons once here
 renderTable();
