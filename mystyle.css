@@ -139,6 +139,30 @@ input[type="number"] {
   color: #56a15a;
 }
 
+.add-round-row td {
+  text-align: center;
+  padding: 1rem;
+  border: none;
+}
+
+.add-round-button {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.add-round-button:hover {
+  background: #c8e6c9;
+}
+
 /* Mobile improvements */
 @media (max-width: 600px) {
   /* Increase base font size */
@@ -221,5 +245,15 @@ input[type="number"] {
   .icon-button {
     padding: 0.5rem;
     font-size: 20px;
+  }
+  
+  /* Style add-round button for mobile */
+  .add-round-button {
+    padding: 1rem 1.5rem;
+    font-size: 18px;
+  }
+  
+  .add-round-row td {
+    padding: 1rem;
   }
 }
