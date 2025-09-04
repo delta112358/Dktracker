@@ -9,14 +9,23 @@ function saveState() {
 
 function loadState() {
   let saved = localStorage.getItem("dokoGame");
-  if (saved) gameState = JSON.parse(saved);
+  if (saved) {
+    gameState = JSON.parse(saved);
+    // Update player name inputs to loaded names
+    for (let i = 0; i < 4; i++) {
+      let input = document.getElementById("player" + i);
+      input.value = gameState.players[i];
+    }
+  }
 }
 
 function renderTable() {
-  // Update player names
+  // Update player names from inputs and sync to gameState
   for (let i = 0; i < 4; i++) {
     let input = document.getElementById("player" + i);
-    gameState.players[i] = input.value || `Player ${i + 1}`;
+    gameState.players[i] = input.value.trim() || `Player ${i + 1}`;
+    // Ensure input reflects fallback if empty
+    if (!input.value.trim()) input.value = gameState.players[i];
   }
 
   const tbody = document.querySelector("#scoreTable tbody");
@@ -24,7 +33,7 @@ function renderTable() {
   let totals = [0, 0, 0, 0];
   let roundCounter = 1; // separate counter for numbered rounds
 
-  gameState.rounds.forEach((round) => {
+  gameState.rounds.forEach((round, index) => {
     let tr = document.createElement("tr");
     let roundLabel = round.solo ? "S" : roundCounter++;
 
@@ -36,9 +45,7 @@ function renderTable() {
     });
 
     rowHtml += `<td>${round.points}</td>`;
-    rowHtml += `<td><button onclick='editRound(${gameState.rounds.indexOf(
-      round
-    )})'>Edit</button></td>`;
+    rowHtml += `<td><button onclick='editRound(${index})'>Edit</button></td>`;
     tr.innerHTML = rowHtml;
 
     // Add separator after every 4th non-solo round
@@ -84,7 +91,7 @@ function addRound() {
   gameState.rounds.push({ points: points, scores: scores, solo: solo });
 
   // Reset form
-  document.getElementById("roundPoints").value = "";
+  document.getElementById("roundPoints").value = "1"; // reset to default 1
   document.getElementById("soloRound").checked = false;
   for (let i = 0; i < 4; i++)
     document.getElementById("winner" + i).checked = false;
@@ -114,10 +121,16 @@ function saveRound(index) {
     document.getElementById(`editPoints${index}`).value,
     10
   );
+  if (isNaN(newPoints) || newPoints <= 0) {
+    return alert("Enter a valid positive point value.");
+  }
+
   let newScores = [];
   for (let i = 0; i < 4; i++) {
-    let val =
-      parseInt(document.getElementById(`edit${index}_${i}`).value, 10) || 0;
+    let val = parseInt(document.getElementById(`edit${index}_${i}`).value, 10);
+    if (isNaN(val)) {
+      return alert("All scores must be valid numbers.");
+    }
     newScores.push(val);
   }
   gameState.rounds[index] = {
@@ -155,6 +168,15 @@ function exportGame() {
   URL.revokeObjectURL(url);
 }
 
+// Add event listeners for player name inputs to persist changes immediately
+for (let i = 0; i < 4; i++) {
+  const playerInput = document.getElementById("player" + i);
+  playerInput.addEventListener("input", () => {
+    gameState.players[i] = playerInput.value.trim() || `Player ${i + 1}`;
+    saveState();
+  });
+}
+
 document.getElementById("addRound").addEventListener("click", addRound);
 document.getElementById("resetGame").addEventListener("click", resetGame);
 document.getElementById("exportGame").addEventListener("click", exportGame);
@@ -174,8 +196,3 @@ document.getElementById("decreasePoints").addEventListener("click", () => {
 // Initialize
 loadState();
 renderTable();
-
-// Keep names synced with state
-for (let i = 0; i < 4; i++) {
-  document.getElementById("player" + i).addEventListener("input", renderTable);
-}
