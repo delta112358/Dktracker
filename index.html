@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Doppelkopf Scoreboard</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="mystyle.css" />
   </head>
   <body>
@@ -81,6 +82,26 @@
         <div class="modal-footer">
           <button type="button" id="modalAddRound" class="modal-add-button">Add Round</button>
           <button type="button" class="modal-cancel-button">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast notification container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Confirm Action</h2>
+          <button type="button" class="modal-close" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage">Are you sure?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="confirmYes" class="modal-confirm-button">Yes</button>
+          <button type="button" id="confirmNo" class="modal-cancel-button">Cancel</button>
         </div>
       </div>
     </div>

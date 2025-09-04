@@ -238,6 +238,58 @@ input[type="number"] {
   background: #e8e8e8;
 }
 
+.modal-confirm-button {
+  background: #bc4f4f;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-confirm-button:hover {
+  background: #a03d3d;
+}
+
+/* Toast notification styles */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.toast {
+  background: #bc4f4f;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  max-width: 300px;
+  pointer-events: auto;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast.success {
+  background: #56a15a;
+}
+
+.toast.warning {
+  background: #f39c12;
+}
+
+.toast.info {
+  background: #3498db;
+}
+
 .add-round-row td {
   text-align: center;
   padding: 1rem;
@@ -260,6 +312,44 @@ input[type="number"] {
 
 .add-round-button:hover {
   background: #c8e6c9;
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem !important;
+  background: #f9f9f9;
+  border: 2px dashed #ccc;
+}
+
+.empty-message {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.empty-message p {
+  margin: 0 0 1rem 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.add-round-button.prominent {
+  background: #56a15a;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.add-round-button.prominent:hover {
+  background: #4a8c4f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Mobile improvements */
@@ -354,5 +444,20 @@ input[type="number"] {
   
   .add-round-row td {
     padding: 1rem;
+  }
+  
+  /* Mobile empty state styling */
+  .empty-state {
+    padding: 2.5rem 1rem !important;
+  }
+  
+  .empty-message p {
+    font-size: 16px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .add-round-button.prominent {
+    padding: 1.25rem 2.5rem;
+    font-size: 18px;
   }
 }

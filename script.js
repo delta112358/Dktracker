@@ -10,6 +10,52 @@ function saveState() {
 // Keep an array to track modal winner button elements for easy reference
 let modalWinnerButtons = [];
 
+// Toast notification functions
+function showToast(message, type = 'error', duration = 4000) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  
+  container.appendChild(toast);
+  
+  // Trigger animation
+  setTimeout(() => toast.classList.add('show'), 100);
+  
+  // Auto remove
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => container.removeChild(toast), 300);
+  }, duration);
+}
+
+// Confirmation modal functions
+function showConfirm(message, onConfirm) {
+  const modal = document.getElementById('confirmModal');
+  const messageEl = document.getElementById('confirmMessage');
+  const yesBtn = document.getElementById('confirmYes');
+  const noBtn = document.getElementById('confirmNo');
+  
+  messageEl.textContent = message;
+  modal.style.display = 'block';
+  
+  // Remove existing listeners
+  const newYesBtn = yesBtn.cloneNode(true);
+  const newNoBtn = noBtn.cloneNode(true);
+  yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+  noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+  
+  // Add new listeners
+  newYesBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    onConfirm();
+  });
+  
+  newNoBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+}
+
 function loadState() {
   let saved = localStorage.getItem("dokoGame");
   if (saved) {
@@ -61,7 +107,21 @@ function renderTable() {
   // Add permanent "Add Round" row at the end
   const addRow = document.createElement("tr");
   addRow.className = "add-round-row";
-  addRow.innerHTML = `<td colspan="7"><button onclick='openAddRoundModal()' aria-label="Add new round" class="add-round-button">Add Round</button></td>`;
+  
+  // If no rounds exist, show a more prominent message
+  if (gameState.rounds.length === 0) {
+    addRow.innerHTML = `
+      <td colspan="7" class="empty-state">
+        <div class="empty-message">
+          <p>No rounds yet. Click the button below to start your first round!</p>
+          <button onclick='openAddRoundModal()' aria-label="Add new round" class="add-round-button prominent">Add Round</button>
+        </div>
+      </td>
+    `;
+  } else {
+    addRow.innerHTML = `<td colspan="7"><button onclick='openAddRoundModal()' aria-label="Add new round" class="add-round-button">Add Round</button></td>`;
+  }
+  
   tbody.appendChild(addRow);
 
   saveState();
@@ -104,10 +164,11 @@ function editRound(index) {
 
 
 function resetGame() {
-  if (confirm("Are you sure you want to reset all scores?")) {
+  showConfirm("Are you sure you want to reset all scores? This action cannot be undone.", () => {
     gameState.rounds = [];
     renderTable();
-  }
+    showToast("Game has been reset successfully.", "success");
+  });
 }
 
 function exportGame() {
@@ -232,25 +293,32 @@ function buildModalWinnerButtons() {
 
 function addRoundFromModal() {
   let points = parseInt(document.getElementById("modalRoundPoints").value, 10);
-  if (isNaN(points) || points < 0)
-    return alert("Enter a valid point value (0 or greater).");
+  if (isNaN(points) || points < 0) {
+    showToast("Please enter a valid point value (0 or greater).");
+    return;
+  }
 
   let solo = document.getElementById("modalSoloRound").checked;
 
   // Determine winners by active modal buttons
   let winners = modalWinnerButtons.map((btn) => btn.classList.contains("active"));
 
-  if (!winners.includes(true)) return alert("Select at least one winner.");
+  if (!winners.includes(true)) {
+    showToast("Please select at least one winner.");
+    return;
+  }
   
   const winnerCount = winners.filter((w) => w).length;
   
   if (solo) {
     if (winnerCount !== 1 && winnerCount !== 3) {
-      return alert("For a solo round, select exactly 1 winner (solo player) or 3 winners (against solo player).");
+      showToast("For a solo round, select exactly 1 winner (solo player) or 3 winners (against solo player).");
+      return;
     }
   } else {
     if (winnerCount !== 2) {
-      return alert("For a normal round, select exactly 2 winners.");
+      showToast("For a normal round, select exactly 2 winners.");
+      return;
     }
   }
 
@@ -284,6 +352,13 @@ document.querySelector('.modal-close').addEventListener('click', closeAddRoundMo
 document.getElementById('addRoundModal').addEventListener('click', (e) => {
   if (e.target.id === 'addRoundModal') {
     closeAddRoundModal();
+  }
+});
+
+// Close confirmation modal when clicking outside of it
+document.getElementById('confirmModal').addEventListener('click', (e) => {
+  if (e.target.id === 'confirmModal') {
+    document.getElementById('confirmModal').style.display = 'none';
   }
 });
 
