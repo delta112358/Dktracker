@@ -17,7 +17,17 @@ let winnerButtons = [];
 
 // Function to build or rebuild winner buttons based on current player names (called once on load)
 function buildWinnerButtons() {
+  // Preserve the legend element by finding it first
+  const legend = winnerButtonsContainer.querySelector('legend');
+  
+  // Clear only the content after the legend
   winnerButtonsContainer.innerHTML = "";
+  
+  // Restore the legend if it existed
+  if (legend) {
+    winnerButtonsContainer.appendChild(legend);
+  }
+  
   winnerButtons = [];
 
   gameState.players.forEach((playerName, index) => {
