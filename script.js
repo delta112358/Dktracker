@@ -237,6 +237,190 @@ function exportGame() {
   URL.revokeObjectURL(url);
 }
 
+// CSV Import functionality
+function parseCSV(csvText) {
+  const lines = csvText.trim().split('\n');
+  if (lines.length < 2) {
+    throw new Error("CSV file must have at least a header row and one data row");
+  }
+
+  // Parse header
+  const header = lines[0].split(',');
+  if (header.length !== 6) {
+    throw new Error("CSV must have exactly 6 columns: Round, 4 player columns, Points");
+  }
+
+  // Extract player names from header (columns 1-4)
+  const playerNames = header.slice(1, 5);
+  
+  // Parse data rows
+  const rounds = [];
+  for (let i = 1; i < lines.length; i++) {
+    const row = lines[i].split(',');
+    if (row.length !== 6) {
+      throw new Error(`Row ${i + 1} has ${row.length} columns, expected 6`);
+    }
+
+    // Parse round label
+    const roundLabel = row[0].trim();
+    const isSolo = roundLabel === 'S';
+    
+    // Parse cumulative scores (columns 1-4)
+    const cumulativeScores = [];
+    for (let j = 1; j <= 4; j++) {
+      const score = parseFloat(row[j]);
+      if (isNaN(score)) {
+        throw new Error(`Row ${i + 1}, column ${j + 1}: "${row[j]}" is not a valid number`);
+      }
+      cumulativeScores.push(score);
+    }
+
+    // Parse points
+    const points = parseFloat(row[5]);
+    if (isNaN(points) || points < 0) {
+      throw new Error(`Row ${i + 1}, Points column: "${row[5]}" is not a valid positive number`);
+    }
+
+    // Calculate round scores from cumulative scores
+    const roundScores = [];
+    for (let j = 0; j < 4; j++) {
+      const previousScore = i === 1 ? 0 : rounds[i - 2].cumulativeScores[j];
+      const roundScore = cumulativeScores[j] - previousScore;
+      roundScores.push(roundScore);
+    }
+
+    rounds.push({
+      roundLabel,
+      isSolo,
+      cumulativeScores,
+      roundScores,
+      points
+    });
+  }
+
+  return {
+    playerNames,
+    rounds
+  };
+}
+
+function validateImportedData(parsedData) {
+  const { playerNames, rounds } = parsedData;
+
+  // Validate player names
+  for (let i = 0; i < playerNames.length; i++) {
+    if (!playerNames[i] || playerNames[i].trim() === '') {
+      throw new Error(`Player ${i + 1} name is empty`);
+    }
+  }
+
+  // Validate rounds data
+  for (let i = 0; i < rounds.length; i++) {
+    const round = rounds[i];
+    
+    // Check if round scores make sense (should be multiples of points)
+    for (let j = 0; j < 4; j++) {
+      const score = round.roundScores[j];
+      if (score !== 0 && Math.abs(score) !== round.points && Math.abs(score) !== round.points * 3) {
+        throw new Error(`Row ${i + 2}: Player ${j + 1} score ${score} doesn't match expected values (0, ±${round.points}, or ±${round.points * 3})`);
+      }
+    }
+
+    // Check for solo round logic
+    if (round.isSolo) {
+      const winners = round.roundScores.filter(score => score > 0);
+      if (winners.length !== 1 && winners.length !== 3) {
+        throw new Error(`Row ${i + 2}: Solo round must have exactly 1 or 3 winners, found ${winners.length}`);
+      }
+    } else {
+      const winners = round.roundScores.filter(score => score > 0);
+      if (winners.length !== 2) {
+        throw new Error(`Row ${i + 2}: Normal round must have exactly 2 winners, found ${winners.length}`);
+      }
+    }
+  }
+
+  return true;
+}
+
+function importGame() {
+  // Check if there are existing rounds and show warning
+  if (gameState.rounds.length > 0) {
+    showConfirm(
+      "Importing a CSV file will completely replace your current scoreboard. All existing rounds will be lost. Are you sure you want to continue?",
+      () => {
+        // User confirmed, proceed with file selection
+        document.getElementById('csvFileInput').click();
+      }
+    );
+  } else {
+    // No existing rounds, proceed directly
+    document.getElementById('csvFileInput').click();
+  }
+}
+
+function handleCSVImport(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    return; // User cancelled file selection
+  }
+
+  // Reset file input
+  event.target.value = '';
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const csvText = e.target.result;
+      
+      // Parse and validate the CSV
+      const parsedData = parseCSV(csvText);
+      validateImportedData(parsedData);
+      
+      // If we get here, the CSV is valid - proceed with import
+      performImport(parsedData);
+      
+    } catch (error) {
+      showToast(`Import failed: ${error.message}`, 'error');
+    }
+  };
+  
+  reader.onerror = function() {
+    showToast('Error reading file. Please try again.', 'error');
+  };
+  
+  reader.readAsText(file);
+}
+
+function performImport(parsedData) {
+  const { playerNames, rounds } = parsedData;
+  
+  // Update player names
+  for (let i = 0; i < 4; i++) {
+    gameState.players[i] = playerNames[i];
+    const input = document.getElementById(`player${i}`);
+    input.value = playerNames[i];
+  }
+  
+  // Convert imported rounds to our format
+  gameState.rounds = rounds.map(round => ({
+    points: round.points,
+    scores: round.roundScores,
+    solo: round.isSolo
+  }));
+  
+  // Update the display
+  renderTable();
+  
+  // Update graph if visible
+  const graphContainer = document.getElementById("graphContainer");
+  if (graphContainer.style.display !== "none") {
+    updateGraph();
+  }
+  
+  showToast(`Successfully imported ${rounds.length} rounds`, 'success');
+}
+
 // Add event listeners for player name inputs to persist changes immediately
 for (let i = 0; i < 4; i++) {
   const playerInput = document.getElementById("player" + i);
@@ -263,6 +447,8 @@ for (let i = 0; i < 4; i++) {
 
 document.getElementById("resetGame").addEventListener("click", resetGame);
 document.getElementById("exportGame").addEventListener("click", exportGame);
+document.getElementById("importGame").addEventListener("click", importGame);
+document.getElementById("csvFileInput").addEventListener("change", handleCSVImport);
 
 // Graph functionality
 document.getElementById("toggleGraph").addEventListener("click", toggleGraph);

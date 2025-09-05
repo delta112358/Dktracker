@@ -423,6 +423,17 @@ input[type="number"] {
   box-shadow: var(--shadow-large);
 }
 
+/* Import button styling - match other control buttons */
+#importGame {
+  background: var(--color-background-white);
+  color: var(--color-text);
+  border: 1px solid #aaa;
+}
+
+#importGame:hover {
+  background: var(--color-background-hover);
+}
+
 /* Mobile improvements - More aggressive scaling */
 @media (max-width: 768px) {
   :root {
