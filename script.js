@@ -227,12 +227,29 @@ function exportGame() {
     csv += roundLabel + "," + totals.join(",") + "," + round.points + "\n";
   });
 
-  // Create downloadable CSV file as before
+  // Generate descriptive filename with date, time, and player names
+  const now = new Date();
+  const dateString = now.getFullYear().toString() + 
+                    (now.getMonth() + 1).toString().padStart(2, '0') + 
+                    now.getDate().toString().padStart(2, '0');
+  
+  const timeString = now.getHours().toString().padStart(2, '0') + 
+                    now.getMinutes().toString().padStart(2, '0') + 
+                    now.getSeconds().toString().padStart(2, '0');
+  
+  // Create player names string, replacing spaces with underscores
+  const playerNames = gameState.players.map(name => 
+    name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')
+  ).join('-');
+  
+  const filename = `${dateString}-${timeString}-${playerNames}.csv`;
+
+  // Create downloadable CSV file
   let blob = new Blob([csv], { type: "text/csv" });
   let url = URL.createObjectURL(blob);
   let a = document.createElement("a");
   a.href = url;
-  a.download = "doppelkopf_scores.csv";
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }
