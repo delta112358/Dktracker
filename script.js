@@ -31,16 +31,6 @@ function showToast(message, type = 'error', duration = 4000) {
   }, duration);
 }
 
-// Screen reader announcement function
-function announceToScreenReader(message) {
-  const srContainer = document.getElementById('sr-announcements');
-  srContainer.textContent = message;
-  
-  // Clear after announcement
-  setTimeout(() => {
-    srContainer.textContent = '';
-  }, 1000);
-}
 
 // Confirmation modal functions
 function showConfirm(message, onConfirm) {
