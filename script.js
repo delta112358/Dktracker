@@ -704,7 +704,8 @@ function updateGraph() {
     gridGroup.appendChild(text);
   }
   
-  // Vertical grid lines
+  // Vertical grid lines - now includes starting point (0) and all rounds
+  const totalPoints = rounds.length + 1; // +1 for starting point
   for (let i = 0; i <= rounds.length; i++) {
     const x = padding.left + (graphWidth / rounds.length) * i;
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -716,17 +717,29 @@ function updateGraph() {
     line.setAttribute("stroke-width", "1");
     gridGroup.appendChild(line);
     
-    // X-axis labels
-    if (i < rounds.length) {
-      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      text.setAttribute("x", x);
-      text.setAttribute("y", height - padding.bottom + 20);
-      text.setAttribute("text-anchor", "middle");
-      text.setAttribute("font-size", "12");
-      text.setAttribute("fill", "#666");
-      text.textContent = i + 1;
-      gridGroup.appendChild(text);
+    // X-axis labels - show 0 for starting point, then round numbers
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", x);
+    text.setAttribute("y", height - padding.bottom + 20);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("font-size", "12");
+    text.setAttribute("fill", "#666");
+    
+    if (i === 0) {
+      text.textContent = "0";
+    } else {
+      // Match table numbering: solo rounds show "S", others show round number
+      const roundIndex = i - 1;
+      const round = rounds[roundIndex];
+      if (round.solo) {
+        text.textContent = "S";
+        text.setAttribute("fill", "#d32f2f"); // Red color for solo rounds
+        text.setAttribute("font-weight", "bold");
+      } else {
+        text.textContent = i.toString();
+      }
     }
+    gridGroup.appendChild(text);
   }
   
   svg.appendChild(gridGroup);
