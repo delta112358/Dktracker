@@ -1,5 +1,22 @@
+// Import utility functions
+import { showToast, showConfirm, parseCSV, validateImportedData, exportGame } from './js/utils.js';
+
+// Import constants
+import { 
+  SVG_PENCIL, 
+  PLAYER_COLORS, 
+  DEFAULT_PLAYER_NAMES, 
+  GAME_CONFIG, 
+  GRAPH_CONFIG, 
+  TOAST_CONFIG, 
+  CSV_CONFIG, 
+  MODAL_CONFIG, 
+  CSS_CLASSES, 
+  ELEMENT_IDS 
+} from './js/constants.js';
+
 let gameState = {
-  players: ["Player 1", "Player 2", "Player 3", "Player 4"],
+  players: [...DEFAULT_PLAYER_NAMES],
   rounds: [],
 };
 
@@ -10,54 +27,8 @@ function saveState() {
 // Keep an array to track modal winner button elements for easy reference
 let modalWinnerButtons = [];
 
-// Toast notification functions
-function showToast(message, type = 'error', duration = 4000) {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = message;
-  toast.setAttribute('role', 'alert');
-  toast.setAttribute('aria-live', 'polite');
-  
-  container.appendChild(toast);
-  
-  // Trigger animation
-  setTimeout(() => toast.classList.add('show'), 100);
-  
-  // Auto remove
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => container.removeChild(toast), 300);
-  }, duration);
-}
 
 
-// Confirmation modal functions
-function showConfirm(message, onConfirm) {
-  const modal = document.getElementById('confirmModal');
-  const messageEl = document.getElementById('confirmMessage');
-  const yesBtn = document.getElementById('confirmYes');
-  const noBtn = document.getElementById('confirmNo');
-  
-  messageEl.textContent = message;
-  modal.style.display = 'block';
-  
-  // Remove existing listeners
-  const newYesBtn = yesBtn.cloneNode(true);
-  const newNoBtn = noBtn.cloneNode(true);
-  yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
-  noBtn.parentNode.replaceChild(newNoBtn, noBtn);
-  
-  // Add new listeners
-  newYesBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-    onConfirm();
-  });
-  
-  newNoBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-  });
-}
 
 function loadState() {
   let saved = localStorage.getItem("dokoGame");
@@ -85,7 +56,7 @@ function renderTable() {
       currentValue = "";
     }
     
-    gameState.players[i] = currentValue || `Player ${i + 1}`;
+    gameState.players[i] = currentValue || DEFAULT_PLAYER_NAMES[i];
     
     // If the field is empty, show placeholder
     if (!currentValue) {
@@ -111,7 +82,7 @@ function renderTable() {
     });
 
     rowHtml += `<td>${round.points}</td>`;
-    rowHtml += `<td><button onclick='editRound(${index})' aria-label="Edit round" class="icon-button">${svgPencil}</button></td>`;
+    rowHtml += `<td><button onclick='editRound(${index})' aria-label="Edit round" class="icon-button">${SVG_PENCIL}</button></td>`;
     tr.innerHTML = rowHtml;
 
     // Add separator after every 4th non-solo round
@@ -195,160 +166,8 @@ function resetGame() {
   });
 }
 
-function exportGame() {
-  // CSV header: Round, player names, then Points column
-  let csv = "Round," + gameState.players.join(",") + ",Points\n";
-
-  // Initialize totals array to track cumulative scores per player
-  let totals = [0, 0, 0, 0];
-
-  gameState.rounds.forEach((round, idx) => {
-    // Update totals with this round's scores
-    round.scores.forEach((score, i) => {
-      totals[i] += score;
-    });
-
-    // Compose CSV row:
-    // Round label: "S" for solo, otherwise round index + 1
-    // Then totals (running scores)
-    // Then round.points
-    let roundLabel = round.solo ? "S" : idx + 1;
-
-    csv += roundLabel + "," + totals.join(",") + "," + round.points + "\n";
-  });
-
-  // Generate descriptive filename with date, time, and player names
-  const now = new Date();
-  const dateString = now.getFullYear().toString() + 
-                    (now.getMonth() + 1).toString().padStart(2, '0') + 
-                    now.getDate().toString().padStart(2, '0');
-  
-  const timeString = now.getHours().toString().padStart(2, '0') + 
-                    now.getMinutes().toString().padStart(2, '0') + 
-                    now.getSeconds().toString().padStart(2, '0');
-  
-  // Create player names string, replacing spaces with underscores
-  const playerNames = gameState.players.map(name => 
-    name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')
-  ).join('-');
-  
-  const filename = `${dateString}-${timeString}-${playerNames}.csv`;
-
-  // Create downloadable CSV file
-  let blob = new Blob([csv], { type: "text/csv" });
-  let url = URL.createObjectURL(blob);
-  let a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
 
 // CSV Import functionality
-function parseCSV(csvText) {
-  const lines = csvText.trim().split('\n');
-  if (lines.length < 2) {
-    throw new Error("CSV file must have at least a header row and one data row");
-  }
-
-  // Parse header
-  const header = lines[0].split(',');
-  if (header.length !== 6) {
-    throw new Error("CSV must have exactly 6 columns: Round, 4 player columns, Points");
-  }
-
-  // Extract player names from header (columns 1-4)
-  const playerNames = header.slice(1, 5);
-  
-  // Parse data rows
-  const rounds = [];
-  for (let i = 1; i < lines.length; i++) {
-    const row = lines[i].split(',');
-    if (row.length !== 6) {
-      throw new Error(`Row ${i + 1} has ${row.length} columns, expected 6`);
-    }
-
-    // Parse round label
-    const roundLabel = row[0].trim();
-    const isSolo = roundLabel === 'S';
-    
-    // Parse cumulative scores (columns 1-4)
-    const cumulativeScores = [];
-    for (let j = 1; j <= 4; j++) {
-      const score = parseFloat(row[j]);
-      if (isNaN(score)) {
-        throw new Error(`Row ${i + 1}, column ${j + 1}: "${row[j]}" is not a valid number`);
-      }
-      cumulativeScores.push(score);
-    }
-
-    // Parse points
-    const points = parseFloat(row[5]);
-    if (isNaN(points) || points < 0) {
-      throw new Error(`Row ${i + 1}, Points column: "${row[5]}" is not a valid positive number`);
-    }
-
-    // Calculate round scores from cumulative scores
-    const roundScores = [];
-    for (let j = 0; j < 4; j++) {
-      const previousScore = i === 1 ? 0 : rounds[i - 2].cumulativeScores[j];
-      const roundScore = cumulativeScores[j] - previousScore;
-      roundScores.push(roundScore);
-    }
-
-    rounds.push({
-      roundLabel,
-      isSolo,
-      cumulativeScores,
-      roundScores,
-      points
-    });
-  }
-
-  return {
-    playerNames,
-    rounds
-  };
-}
-
-function validateImportedData(parsedData) {
-  const { playerNames, rounds } = parsedData;
-
-  // Validate player names
-  for (let i = 0; i < playerNames.length; i++) {
-    if (!playerNames[i] || playerNames[i].trim() === '') {
-      throw new Error(`Player ${i + 1} name is empty`);
-    }
-  }
-
-  // Validate rounds data
-  for (let i = 0; i < rounds.length; i++) {
-    const round = rounds[i];
-    
-    // Check if round scores make sense (should be multiples of points)
-    for (let j = 0; j < 4; j++) {
-      const score = round.roundScores[j];
-      if (score !== 0 && Math.abs(score) !== round.points && Math.abs(score) !== round.points * 3) {
-        throw new Error(`Row ${i + 2}: Player ${j + 1} score ${score} doesn't match expected values (0, ±${round.points}, or ±${round.points * 3})`);
-      }
-    }
-
-    // Check for solo round logic
-    if (round.isSolo) {
-      const winners = round.roundScores.filter(score => score > 0);
-      if (winners.length !== 1 && winners.length !== 3) {
-        throw new Error(`Row ${i + 2}: Solo round must have exactly 1 or 3 winners, found ${winners.length}`);
-      }
-    } else {
-      const winners = round.roundScores.filter(score => score > 0);
-      if (winners.length !== 2) {
-        throw new Error(`Row ${i + 2}: Normal round must have exactly 2 winners, found ${winners.length}`);
-      }
-    }
-  }
-
-  return true;
-}
 
 function importGame() {
   // Check if there are existing rounds and show warning
@@ -453,7 +272,7 @@ for (let i = 0; i < 4; i++) {
 }
 
 document.getElementById("resetGame").addEventListener("click", resetGame);
-document.getElementById("exportGame").addEventListener("click", exportGame);
+document.getElementById("exportGame").addEventListener("click", () => exportGame(gameState));
 document.getElementById("importGame").addEventListener("click", importGame);
 document.getElementById("csvFileInput").addEventListener("change", handleCSVImport);
 
@@ -461,10 +280,6 @@ document.getElementById("csvFileInput").addEventListener("change", handleCSVImpo
 document.getElementById("toggleGraph").addEventListener("click", toggleGraph);
 
 
-const svgPencil = `
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2L3 10.207V13h2.793L14 4.793 11.207 2z"/>
-</svg>`;
 
 
 // Modal functions
@@ -552,12 +367,12 @@ function addRoundFromModal() {
   const winnerCount = winners.filter((w) => w).length;
   
   if (solo) {
-    if (winnerCount !== 1 && winnerCount !== 3) {
+    if (!GAME_CONFIG.SOLO_WINNER_COUNTS.includes(winnerCount)) {
       showToast("For a solo round, select exactly 1 winner (solo player) or 3 winners (against solo player).");
       return;
     }
   } else {
-    if (winnerCount !== 2) {
+    if (winnerCount !== GAME_CONFIG.NORMAL_WINNER_COUNT) {
       showToast("For a normal round, select exactly 2 winners.");
       return;
     }
@@ -570,10 +385,10 @@ function addRoundFromModal() {
     // - If 3 winners (solo player loses): winners get 1x points, loser gets -3x points
     if (winnerCount === 1) {
       // Solo player wins
-      scores = winners.map((w) => (w ? points * 3 : -points));
+      scores = winners.map((w) => (w ? points * GAME_CONFIG.SOLO_MULTIPLIER : -points));
     } else {
       // Solo player loses (3 winners)
-      scores = winners.map((w) => (w ? points : -points * 3));
+      scores = winners.map((w) => (w ? points : -points * GAME_CONFIG.SOLO_MULTIPLIER));
     }
   } else {
     scores = winners.map((w) => (w ? points : -points));
@@ -667,9 +482,9 @@ function updateGraph() {
   });
   
   // Graph dimensions and padding
-  const width = Math.max(400, rounds.length * 60 + 100);
-  const height = 300;
-  const padding = { top: 20, right: 40, bottom: 40, left: 60 };
+  const width = Math.max(GRAPH_CONFIG.MIN_WIDTH, rounds.length * GRAPH_CONFIG.ROUND_WIDTH_MULTIPLIER + GRAPH_CONFIG.ADDITIONAL_WIDTH);
+  const height = GRAPH_CONFIG.HEIGHT;
+  const padding = GRAPH_CONFIG.PADDING;
   const graphWidth = width - padding.left - padding.right;
   const graphHeight = height - padding.top - padding.bottom;
   
@@ -680,7 +495,7 @@ function updateGraph() {
   const scoreRange = maxScore - minScore || 1; // Avoid division by zero
   
   // Player colors
-  const colors = ['#56a15a', '#bc4f4f', '#3498db', '#f39c12'];
+  const colors = PLAYER_COLORS;
   
   // Create SVG
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -693,8 +508,8 @@ function updateGraph() {
   gridGroup.setAttribute("class", "grid");
   
   // Horizontal grid lines
-  for (let i = 0; i <= 5; i++) {
-    const y = padding.top + (graphHeight / 5) * i;
+  for (let i = 0; i <= GRAPH_CONFIG.GRID_LINES; i++) {
+    const y = padding.top + (graphHeight / GRAPH_CONFIG.GRID_LINES) * i;
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("x1", padding.left);
     line.setAttribute("y1", y);
@@ -705,7 +520,7 @@ function updateGraph() {
     gridGroup.appendChild(line);
     
     // Y-axis labels
-    const score = maxScore - (scoreRange / 5) * i;
+    const score = maxScore - (scoreRange / GRAPH_CONFIG.GRID_LINES) * i;
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.setAttribute("x", padding.left - 10);
     text.setAttribute("y", y + 4);
@@ -778,7 +593,7 @@ function updateGraph() {
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", pathData);
     path.setAttribute("stroke", color);
-    path.setAttribute("stroke-width", "2");
+    path.setAttribute("stroke-width", GRAPH_CONFIG.LINE_WIDTH);
     path.setAttribute("fill", "none");
     path.setAttribute("class", `player-line player-${playerIndex}`);
     svg.appendChild(path);
@@ -791,7 +606,7 @@ function updateGraph() {
       const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       circle.setAttribute("cx", x);
       circle.setAttribute("cy", y);
-      circle.setAttribute("r", "4");
+      circle.setAttribute("r", GRAPH_CONFIG.POINT_RADIUS);
       circle.setAttribute("fill", color);
       circle.setAttribute("stroke", "#fff");
       circle.setAttribute("stroke-width", "2");
@@ -824,8 +639,8 @@ function updateGraph() {
   const legendGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
   legendGroup.setAttribute("class", "legend");
   
-  for (let i = 0; i < 4; i++) {
-    const legendY = 20 + i * 20;
+  for (let i = 0; i < GAME_CONFIG.MAX_PLAYERS; i++) {
+    const legendY = GRAPH_CONFIG.LEGEND_OFFSET + i * GRAPH_CONFIG.LEGEND_OFFSET;
     
     // Legend line
     const legendLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -834,13 +649,13 @@ function updateGraph() {
     legendLine.setAttribute("x2", width - 100);
     legendLine.setAttribute("y2", legendY);
     legendLine.setAttribute("stroke", colors[i]);
-    legendLine.setAttribute("stroke-width", "2");
+    legendLine.setAttribute("stroke-width", GRAPH_CONFIG.LINE_WIDTH);
     legendGroup.appendChild(legendLine);
     
     // Legend text
     const legendText = document.createElementNS("http://www.w3.org/2000/svg", "text");
     legendText.setAttribute("x", width - 95);
-    legendText.setAttribute("y", legendY + 4);
+    legendText.setAttribute("y", legendY + GRAPH_CONFIG.LEGEND_TEXT_OFFSET);
     legendText.setAttribute("font-size", "12");
     legendText.setAttribute("fill", "#333");
     legendText.textContent = gameState.players[i];
@@ -853,6 +668,10 @@ function updateGraph() {
   graphContainer.innerHTML = "";
   graphContainer.appendChild(svg);
 }
+
+// Make functions available globally for onclick handlers
+window.openAddRoundModal = openAddRoundModal;
+window.editRound = editRound;
 
 // Initialize on page load
 loadState();
