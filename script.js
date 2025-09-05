@@ -579,7 +579,16 @@ function addRoundFromModal() {
 
   let scores;
   if (solo) {
-    scores = winners.map((w) => (w ? points * 3 : -points));
+    // Solo round logic:
+    // - If 1 winner (solo player wins): winner gets 3x points, losers get -1x points
+    // - If 3 winners (solo player loses): winners get 1x points, loser gets -3x points
+    if (winnerCount === 1) {
+      // Solo player wins
+      scores = winners.map((w) => (w ? points * 3 : -points));
+    } else {
+      // Solo player loses (3 winners)
+      scores = winners.map((w) => (w ? points : -points * 3));
+    }
   } else {
     scores = winners.map((w) => (w ? points : -points));
   }
