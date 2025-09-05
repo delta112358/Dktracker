@@ -142,7 +142,7 @@ function renderTable() {
       <td colspan="7" class="empty-state">
         <div class="empty-message">
           <p>No rounds yet. Click the button below to start your first round!</p>
-          <button onclick='openAddRoundModal()' aria-label="Add new round" class="add-round-button prominent">Add Round</button>
+          <button onclick='openAddRoundModal()' aria-label="Add new round" class="add-round-button">Add Round</button>
         </div>
       </td>
     `;
