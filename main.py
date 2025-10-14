@@ -182,18 +182,6 @@ else:
 
     tab1, tab2, tab3 = st.tabs(["📊 Scoreboard & New Game", "📈 Analytics & History", "🧠 Cheatsheet"])
     with tab1:
-        st.header("Add New Game Result")
-        st.toggle("Solo Game?", key="is_solo")
-        with st.form("new_game_form"):
-            if st.session_state.is_solo:
-                st.selectbox("Select the solo player", options=st.session_state.player_names, key="solo_player_input",
-                             index=None, placeholder="Select a player...")
-            else:
-                st.multiselect("Select 'Re' party (winners)", options=st.session_state.player_names, max_selections=2,
-                               key="normal_player_input", placeholder="Select two players...")
-            st.number_input("Points for this game", min_value=1, step=1, key="points_input")
-            st.form_submit_button("Add Game", on_click=process_game_submission)
-        st.divider()
         st.header("Current Standings")
 
         next_dealer_name = st.session_state.player_names[st.session_state.dealer_index]
@@ -217,6 +205,20 @@ else:
                 st.dataframe(round_df)
         else:
             st.info("No games have been added yet.")
+            
+        st.divider()
+        
+        st.header("Add New Game Result")
+        st.toggle("Solo Game?", key="is_solo")
+        with st.form("new_game_form"):
+            if st.session_state.is_solo:
+                st.selectbox("Select the solo player", options=st.session_state.player_names, key="solo_player_input",
+                             index=None, placeholder="Select a player...")
+            else:
+                st.multiselect("Select 'Re' party (winners)", options=st.session_state.player_names, max_selections=2,
+                               key="normal_player_input", placeholder="Select two players...")
+            st.number_input("Points for this game", min_value=1, step=1, key="points_input")
+            st.form_submit_button("Add Game", on_click=process_game_submission)
     with tab2:
         st.header("Score Progression")
         if st.session_state.game_history:
