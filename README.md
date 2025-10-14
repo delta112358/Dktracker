@@ -34,7 +34,7 @@ The project is structured to allow for easy development in Python while deployin
 Python 3 installed on your local machine.
 
 ### File Structure
-streamlit_app.py: This is the main file where all the Streamlit application logic resides. You will edit this file to make changes to the app.
+main.py: This is the main file where all the Streamlit application logic resides. You will edit this file to make changes to the app.
 
 template.html: An HTML template that contains the stlite setup and a placeholder for the Python code.
 
@@ -42,13 +42,13 @@ build.py: A simple Python script that automatically combines streamlit_app.py an
 
 ### How to Build
 #### Modify the App (Optional):
-Make any desired changes to the application by editing the streamlit_app.py file. For a faster development cycle, you can test your changes locally by running streamlit run streamlit_app.py in your terminal.
+Make any desired changes to the application by editing the main.py file. For a faster development cycle, you can test your changes locally by running streamlit run main.py in your terminal.
 
 #### Run the Build Script:
 Once you are happy with your changes, run the build script from your terminal in the project's root directory:
-
+```
 python build.py
-
+```
 This command will read the contents of your Python app, inject them into the HTML template, and create the final index.html file.
 
 #### Test the Static App Locally:
@@ -56,18 +56,22 @@ You cannot open index.html directly in the browser. It must be served by a local
 
 Navigate to the project directory in your terminal.
 
-Run the command: python -m http.server
-
-Open your web browser and go to: http://localhost:8000
-
+Run the command:
+```
+python -m http.server
+```
+Open your web browser and go to:
+```
+http://localhost:8000
+```
 ## Deployment to GitHub Pages
 You can host this app for free using GitHub Pages.
 
-### Create a Repository: Create a new public repository on your GitHub account.
+Create a Repository: Create a new public repository on your GitHub account.
 
-### Upload the File: Upload only the final, generated index.html file to your new repository.
+Upload the File: Upload only the final, generated index.html file to your new repository.
 
-### Enable GitHub Pages:
+Enable GitHub Pages:
 
 In your repository, go to the Settings tab.
 
@@ -79,6 +83,3 @@ Set the Branch to main (or whichever branch you uploaded the file to) and the fo
 
 ### Done!
 After a minute or two, your app will be live! GitHub will display the URL for your published site at the top of the Pages settings (e.g., https://<your-username>.github.io/<your-repo-name>/).
-
-## Customization
-To change the house rules on the cheat sheet, simply edit the Markdown text within the st.markdown() functions in the "Cheatsheet" section of streamlit_app.py and then run the build.py script again.
