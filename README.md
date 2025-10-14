@@ -1,3 +1,5 @@
+# <img src="logo.svg" alt="Logo" height="60">
+
 # Doppelkopf Score Tracker
 A modern, fast, and fully in-browser score tracker for the German card game Doppelkopf. This application is built with Streamlit and converted into a completely static, serverless web page using stlite, allowing it to be hosted anywhere.
 
