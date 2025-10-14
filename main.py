@@ -124,12 +124,12 @@ def generate_round_tables(game_history, scores, player_names):
     normal_game_count = 0
 
     for i, game in enumerate(game_history):
-        game_data = {
-            'Game Type': game['Type'],
-            'Points Awarded': game['Points']
-        }
+        game_data = {}
         for player in player_names:
             game_data[player] = scores[player][i]
+
+        game_data['Points Awarded']=game['Points']
+        game_data['Game Type']=game['Type']
         round_games_data.append(game_data)
 
         if game['Type'] == 'Normal':
@@ -192,7 +192,7 @@ else:
 
         for player in sorted_players:
             with cols.pop(0):
-                label = f"{player} 🃏" if player == next_dealer_name else player
+                label = f"🃏 {player}" if player == next_dealer_name else player
                 st.metric(label=label,
                           value=st.session_state.scores[player][-1] if st.session_state.scores[player] else 0)
 
@@ -253,7 +253,8 @@ else:
                 xaxis=dict(gridcolor='#e0e0e0', dtick=1),
                 yaxis=dict(gridcolor='#e0e0e0')
             )
-            st.plotly_chart(fig, use_container_width=True)
+            config = {'staticPlot': True, 'displayModeBar': False}
+            st.plotly_chart(fig, use_container_width=True, config=config)
         else:
             st.info("The chart will appear here once games are added.")
         st.divider()

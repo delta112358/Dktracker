@@ -76,6 +76,13 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         border-left: 5px solid #007BFF;
     }
+    [data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) {
+        flex-wrap: nowrap;
+    }
+    [data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) > div {
+        flex: 1;
+        min-width: 0;
+    }
     .card {
         background: #ffffff;
         border-radius: 10px;
@@ -105,3 +112,4 @@
   </script>
 </body>
 </html>
+
