@@ -269,22 +269,51 @@ else:
         st.subheader("Card Ranking (Highest to Lowest)")
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown(
-                '''<div class="card"><div class="card-title">Trump Cards Hierarchy</div><div class="card-content"><ol><li>♥️ 10 (Dullen)</li><li>♣️ Q (Alte)</li><li>♠️ Q (Alte)</li><li>♥️ Q (Alte)</li><li>♦️ Q (Alte)</li><li>♣️ J</li><li>♠️ J</li><li>♥️ J</li><li>♦️ J</li><li>♦️ A</li><li>♦️ 10</li><li>♦️ K</li></ol><i>Special Rule: If both ♥️10s are played in the same trick, the second one played wins (unless it's the last trick).</i></div></div>''',
+            st.markdown('''<div class="card"><div class="card-title">Trump Cards Hierarchy</div><div class="card-content"><ol>
+                <li>♥️ 10 (Dullen)</li>
+                <li>♣️ Q (Alte)</li>
+                <li>♠️ Q (Alte)</li>
+                <li>♥️ Q (Alte)</li>
+                <li>♦️ Q (Alte)</li>
+                <li>♣️ J (Karlchen)</li>
+                <li>♠️ J</li>
+                <li>♥️ J</li>
+                <li>♦️ J</li>
+                <li>♦️ A (Fuchs)</li>
+                <li>♦️ 10</li>
+                <li>♦️ K</li>
+                </ol>
+                <i>Special Rule: If both ♥️10s are played in the same trick, the second one played wins (unless it's the last trick).</i></div></div>''',
                 unsafe_allow_html=True)
         with col2:
-            st.markdown(
-                '''<div class="card"><div class="card-title">Non-Trump Suit Ranking</div><div class="card-content">For any non-trump suit (♣️, ♠️, ♥️):<ol><li>Ace (A)</li><li>Ten (10)</li><li>King (K)</li></ol><br><i>If two identical cards are played, the first one wins.</i></div></div>''',
+            st.markdown('''<div class="card"><div class="card-title">Non-Trump Suit Ranking</div><div class="card-content">For any non-trump suit (♣️, ♠️, ♥️):<ol>
+                <li>Ace (A)</li>
+                <li>Ten (10)</li>
+                <li>King (K)</li>
+                </ol>
+                <br><i>If two identical cards are played, the first one wins.</i></div></div>''',
                 unsafe_allow_html=True)
-        st.subheader("Reservation Priority (Vorbehalt)")
-        st.markdown('''<div class="card"><div class="card-title">Determining What is Played</div><div class="card-content">If one or more players announce a reservation, the priority is:<ol>
-            <li><b>Misdeal / Throwing In (highest priority):</b> A player can declare a misdeal before the first card is played if they have:
-                <ul>
-                    <li>Less than 3 trump cards</li>
-                    <li>5 or more Kings</li>
-                    <li>7 or more Aces/Tens (Volle)</li>
-                    <li>All personal trumps are lower than the Jack of Diamonds</li>
-                </ul>
-            </li>
-            <li><b>Hochzeit (Wedding):</b> Outranks any Solo.</li>
-            <li><b>Solo</b></li></ol></div></div>''', unsafe_allow_html=True)
+        
+        st.subheader("Reservation Priority (Vorbehalt) and Bonus Points")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown('''<div class="card"><div class="card-title">Determining What is Played</div><div class="card-content">If one or more players announce a reservation, the priority is:<ol>
+                <li><b>Misdeal / Throwing In (highest priority):</b> A player can declare a misdeal before the first card is played if they have:
+                    <ul>
+                        <li>Less than 3 trump cards</li>
+                        <li>5 or more Kings</li>
+                        <li>7 or more Aces/Tens (Volle)</li>
+                        <li>All personal trumps are lower than the Jack of Diamonds</li>
+                    </ul>
+                </li>
+                <li><b>Hochzeit (Wedding):</b> Outranks any Solo.</li>
+                <li><b>Solo</b></li>
+                </ol>
+                </div></div>''', unsafe_allow_html=True)
+        with col2:
+            st.markdown('''<div class="card"><div class="card-title">Bonus Points</div><div class="card-content">There are bonus points to win under these conditions:<ol>
+                <li>Get the opponents ♦️ A (Fuchs) in your trick</li>
+                <li>Get four 10s or As in your trick (four "Volle")</li>
+                <li>Get the last trick with ♣️ J (Karlchen)</li>
+                </ol>
+                </div></div>''', unsafe_allow_html=True)
